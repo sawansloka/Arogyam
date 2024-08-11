@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - docker-publish-workflow
   pull_request:
     branches:
       - main
+      - docker-publish-workflow
 
 jobs:
   build:
