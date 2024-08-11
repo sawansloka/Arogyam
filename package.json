@@ -1,0 +1,32 @@
+{
+  "name": "arogyam",
+  "version": "1.0.0",
+  "description": "A clinic website",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sawansloka/Arogyam.git"
+  },
+  "author": "Sloka Sawan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sawansloka/Arogyam/issues"
+  },
+  "homepage": "https://github.com/sawansloka/Arogyam#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "http-status": "^1.7.4",
+    "http-status-codes": "^2.3.0",
+    "mongoose": "^8.5.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.4",
+    "validator": "^13.12.0"
+  }
+}
