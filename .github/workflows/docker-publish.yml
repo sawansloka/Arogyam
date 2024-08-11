@@ -41,7 +41,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/arogyam-backend:${{ github.sha }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/arogyam-backend:latest
 
     - name: Logout from Docker Hub
       run: docker logout
