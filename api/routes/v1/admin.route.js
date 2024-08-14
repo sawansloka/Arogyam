@@ -9,6 +9,14 @@ const router = express.Router();
 router.route('/clinic-meta').post(adminAuth, adminController.upsertClinicMeta)
     .get(adminAuth, commonController.getClinicMeta);
 
+router.route('/clinic-meta/:metaId')
+    .put(adminAuth, adminController.updateClinicMetaData);
+
+router.route('/clinic-meta/:metaId')
+    .delete(adminAuth, adminController.deleteClinicMeta);
+
+//Customer feedback data
+
 //Customer Feedback data
 router.route('/feedbacks')
     .get(adminAuth, adminController.listAllFeedbacks);

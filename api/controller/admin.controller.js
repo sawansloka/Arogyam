@@ -32,7 +32,7 @@ exports.upsertClinicMeta = async (req, res) => {
       clinicMetaData = new ClinicMetaData({
         bannerUrl,
         desc: {
-          header: desc.header,
+          title: desc.title,
           body: desc.body
         },
         faqs: faqs || [] // Default to empty array if no faqs provided
@@ -52,6 +52,65 @@ exports.upsertClinicMeta = async (req, res) => {
   }
 };
 
+exports.updateClinicMetaData = async (req, res) => {
+  try {
+    const { metaId } = req.params;
+    const existingMetaData = await ClinicMetaData.findById(metaId);
+    if(!existingMetaData) {
+      throw new Error('Clinic meta data not found');
+    }
+    const { bannerUrl, desc, faqs } = req.body;
+    if(bannerUrl)
+      existingMetaData.bannerUrl = bannerUrl;
+    if(desc) {
+      if(desc.title)
+        existingMetaData.desc.title = desc.title;
+      if(desc.body && desc.body.length){
+        existingMetaData.desc.body = [ ...existingMetaData.desc.body, ...desc.body ];
+      }
+    }
+    if(faqs && faqs.length){
+      existingMetaData.faqs = [...existingMetaData.faqs,...faqs ];
+    }
+    await existingMetaData.save();
+    res.status(StatusCodes.CREATED).send({
+      status: 'Clinic meta data updated successfully',
+      data: existingMetaData,
+    });
+  } catch (err) {
+    res.status(StatusCodes.BAD_REQUEST).send({
+      status: 'Updatation failed',
+      error: err.message || err,
+    });
+  }
+}
+
+exports.deleteClinicMeta = async (req, res) => {
+  try {
+    const { metaId } = req.params;
+    const existingMetaData = await ClinicMetaData.findById(metaId);
+    if (!existingMetaData) {
+      throw new Error('Clinic meta data not found');
+    }
+    const { descBody, faq } = req.body;
+    if(descBody){
+      existingMetaData.desc.body = existingMetaData.desc.body.filter(data => data !== descBody);
+    }
+    if(faq){
+      existingMetaData.faqs = existingMetaData.faqs.filter(data => data.id !== faq);
+    }
+    await existingMetaData.save();
+    res.status(StatusCodes.OK).send({
+      status: 'Clinic meta data deleted successfully',
+      data: existingMetaData,
+    });
+  } catch (err) {
+    res.status(StatusCodes.BAD_REQUEST).send({
+      status: 'Deletion failed',
+      error: err.message || err,
+    });
+  }
+}
 
 //CustomerFeedback data
 exports.listAllFeedbacks = async (req, res) => {
