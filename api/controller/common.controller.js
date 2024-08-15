@@ -1,4 +1,4 @@
-const {StatusCodes} = require('http-status-codes');
+const { StatusCodes } = require('http-status-codes');
 const ClinicMetaData = require('../../model/clinicMetaData');
 
 exports.getClinicMeta = async (req, res) => {

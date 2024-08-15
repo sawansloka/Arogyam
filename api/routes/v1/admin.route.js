@@ -30,4 +30,15 @@ router
   .put(adminAuth, adminController.updateFeedbackById)
   .delete(adminAuth, adminController.deleteFeedback);
 
+//appointment booking
+router.route('/setSchedule').post(adminController.setSchedule);
+
+router.route('/appointments').get(adminController.listAppointments);
+
+router
+  .route('/appointments/:id')
+  .get(adminController.getAppointmentById)
+  .put(adminController.editAppointmentById)
+  .delete(adminController.deleteAppointmentById);
+
 module.exports = router;
