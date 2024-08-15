@@ -8,7 +8,7 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "lint": "eslint api/**/*.js",
-    "format": "prettier --write 'api/' --loglevel=silent"
+    "format": "prettier --write 'api/'"
   },
   "lint-staged": {
     "api/**/*.{js,jsx}": [
