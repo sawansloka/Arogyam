@@ -125,7 +125,7 @@ exports.deleteClinicMeta = async (req, res) => {
 exports.listAllFeedbacks = async (req, res) => {
   try {
     const { name, page = 1, limit = 10 } = req.query;
-    let filter = {};
+    const filter = {};
 
     const pageNumber = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
     const limitNumber = parseInt(limit, 10) > 0 ? parseInt(limit, 10) : 10;
@@ -247,27 +247,28 @@ exports.deleteFeedback = async (req, res) => {
 // Appointment
 exports.setSchedule = async (req, res) => {
   try {
-    const { date, startTime, endTime, breakTime, maxPatientsPerInterval, intervalMinutes } = req.body;
+    const { date, startTime, endTime, breakTime, maxPatientsPerInterval } =
+      req.body;
 
     const slot = new Slot({
       date: toIST(new Date(date)),
       startTime,
       endTime,
       breakTime,
-      maxSlots: maxPatientsPerInterval,
+      maxSlots: maxPatientsPerInterval
     });
 
     await slot.save();
 
-    res.status(StatusCodes.CREATED).send({
+    return res.status(StatusCodes.CREATED).send({
       status: 'Success',
       message: 'Schedule set successfully',
       slotId: slot._id
     });
   } catch (e) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
-      error: e.message || e,
+      error: e.message || e
     });
   }
 };
@@ -275,7 +276,7 @@ exports.setSchedule = async (req, res) => {
 exports.listAppointments = async (req, res) => {
   try {
     const { name, date, page = 1, limit = 10 } = req.query;
-    let filter = {};
+    const filter = {};
     let appointmentIds = [];
 
     const pageNumber = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
@@ -295,7 +296,7 @@ exports.listAppointments = async (req, res) => {
       });
 
       if (slot) {
-        appointmentIds = slot.appointmentIds.map(idObj => idObj._id);
+        appointmentIds = slot.appointmentIds.map((idObj) => idObj._id);
       } else {
         return res.status(StatusCodes.NOT_FOUND).send({
           status: 'Not found',
@@ -321,7 +322,7 @@ exports.listAppointments = async (req, res) => {
 
     const totalAppointments = await Patient.countDocuments(filter);
 
-    res.status(StatusCodes.OK).send({
+    return res.status(StatusCodes.OK).send({
       status: 'Success',
       data: appointments,
       meta: {
@@ -332,9 +333,9 @@ exports.listAppointments = async (req, res) => {
       }
     });
   } catch (e) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
-      error: e.message || e,
+      error: e.message || e
     });
   }
 };
@@ -351,14 +352,14 @@ exports.getAppointmentById = async (req, res) => {
       });
     }
 
-    res.status(StatusCodes.OK).send({
+    return res.status(StatusCodes.OK).send({
       status: 'Success',
       data: appointment
     });
   } catch (e) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
-      error: e.message || e,
+      error: e.message || e
     });
   }
 };
@@ -372,7 +373,9 @@ exports.editAppointmentById = async (req, res) => {
       updateData.appointmentTime = toIST(new Date(updateData.appointmentTime));
     }
 
-    const appointment = await Patient.findByIdAndUpdate(id, updateData, { new: true });
+    const appointment = await Patient.findByIdAndUpdate(id, updateData, {
+      new: true
+    });
     if (!appointment) {
       return res.status(StatusCodes.NOT_FOUND).send({
         status: 'Not found',
@@ -382,10 +385,14 @@ exports.editAppointmentById = async (req, res) => {
 
     if (updateData.appointmentTime) {
       const oldSlot = await Slot.findOne({ appointmentIds: appointment._id });
-      const newSlot = await Slot.findOne({ date: toIST(new Date(updateData.appointmentTime)) });
+      const newSlot = await Slot.findOne({
+        date: toIST(new Date(updateData.appointmentTime))
+      });
 
       if (oldSlot && oldSlot._id.toString() !== newSlot._id.toString()) {
-        oldSlot.appointmentIds = oldSlot.appointmentIds.filter(id => id.toString() !== appointment._id.toString());
+        oldSlot.appointmentIds = oldSlot.appointmentIds.filter(
+          (slotId) => slotId.toString() !== appointment._id.toString()
+        );
         await oldSlot.save();
 
         if (newSlot) {
@@ -395,15 +402,15 @@ exports.editAppointmentById = async (req, res) => {
       }
     }
 
-    res.status(StatusCodes.OK).send({
+    return res.status(StatusCodes.OK).send({
       status: 'Success',
       message: 'Appointment updated successfully',
       data: appointment
     });
   } catch (e) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
-      error: e.message || e,
+      error: e.message || e
     });
   }
 };
@@ -425,14 +432,14 @@ exports.deleteAppointmentById = async (req, res) => {
       { $pull: { appointmentIds: appointment._id } }
     );
 
-    res.status(StatusCodes.OK).send({
+    return res.status(StatusCodes.OK).send({
       status: 'Success',
       message: 'Appointment deleted successfully'
     });
   } catch (e) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
-      error: e.message || e,
+      error: e.message || e
     });
   }
 };

@@ -13,13 +13,10 @@ router.route('/feedbacks').post(publicController.createFeedback);
 router.route('/testimonials').get(publicController.getTestimonials);
 
 //appointment booking
-router.route('/slots')
-    .get(publicController.listAvailableSlots);
+router.route('/slots').get(publicController.listAvailableSlots);
 
-router.route('/appointments')
-    .post(publicController.bookAppointment);
+router.route('/appointments').post(publicController.bookAppointment);
 
-router.route('/track-status')
-    .get(publicController.trackAppointmentStatus);
+router.route('/track-status').get(publicController.trackAppointmentStatus);
 
 module.exports = router;
