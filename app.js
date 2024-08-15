@@ -1,6 +1,6 @@
-const app = require('./config/express');
-const { port } = require('./config/vars');
-require('./config/mongoose');
+const app = require('./src/config/express');
+const { port } = require('./src/config/vars');
+require('./src/config/mongoose');
 
 app.listen(port, () => {
   console.log(`Server listening on ${port}`);

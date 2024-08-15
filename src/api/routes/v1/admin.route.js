@@ -5,7 +5,7 @@ const adminAuth = require('../../middleware/adminAuth');
 
 const router = express.Router();
 
-//Clinic meta data
+// Clinic meta data
 router
   .route('/clinic-meta')
   .post(adminAuth, adminController.upsertClinicMeta)
@@ -19,9 +19,9 @@ router
   .route('/clinic-meta/:metaId')
   .delete(adminAuth, adminController.deleteClinicMeta);
 
-//Customer feedback data
+// Customer feedback data
 
-//Customer Feedback data
+// Customer Feedback data
 router.route('/feedbacks').get(adminAuth, adminController.listAllFeedbacks);
 
 router
@@ -30,7 +30,7 @@ router
   .put(adminAuth, adminController.updateFeedbackById)
   .delete(adminAuth, adminController.deleteFeedback);
 
-//appointment booking
+// appointment booking
 router.route('/setSchedule').post(adminController.setSchedule);
 
 router.route('/appointments').get(adminController.listAppointments);
