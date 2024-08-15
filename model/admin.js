@@ -3,28 +3,20 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const adminSchema = new mongoose.Schema(
-  {
-    firstname: {
-      type: String,
-      required: [true, 'Please provide your first name'],
-      trim: true
-    },
-    lastname: {
-      type: String,
-      required: [false, 'Please provide your last name'],
-      trim: true
-    },
-    email: {
-      type: String,
-      unique: true,
-      required: [true, 'Please provide your email address'],
-      trim: true,
-      lowercase: true,
-      validate(value) {
-        if (!validator.isEmail(value)) {
-          throw new Error('Please provide a valid Email');
-        }
+const adminSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, "Please provide your name"],
+  },
+  email: {
+    type: String,
+    unique: true,
+    required: [true, "Please provide your email address"],
+    trim: true,
+    lowercase: true,
+    validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new Error('Please provide a valid Email')
       }
     },
     password: {
@@ -46,9 +38,8 @@ const adminSchema = new mongoose.Schema(
     //   }
     // }],
   },
-  {
-    timestamps: true
-  }
+  timestamps: true
+}
 );
 
 adminSchema.methods.toJSON = function () {
