@@ -5,16 +5,11 @@ const publicController = require('../../controller/public.controller');
 const router = express.Router();
 
 //Clinic meta data
-router.route('/clinic-meta')
-    .get(commonController.getClinicMeta);
-
+router.route('/clinic-meta').get(commonController.getClinicMeta);
 
 //Customer feedback
-router.route('/feedbacks')
-    .post(publicController.createFeedback);
+router.route('/feedbacks').post(publicController.createFeedback);
 
-router.route('/testimonials')
-    .get(publicController.getTestimonials);
-
+router.route('/testimonials').get(publicController.getTestimonials);
 
 module.exports = router;
