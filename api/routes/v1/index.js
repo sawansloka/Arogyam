@@ -6,7 +6,7 @@ const publicRoutes = require('./public.route');
 const router = express.Router();
 
 router.get('/app/health', (req, res) => {
-    res.send({ message: "Server is up!!!", status: httpStatus.OK });
+  res.send({ message: 'Server is up!!!', status: httpStatus.OK });
 });
 
 router.use('/v1/admin', adminRoutes);

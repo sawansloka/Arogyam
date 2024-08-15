@@ -1,103 +1,110 @@
 const mongoose = require('mongoose');
-const validator = require('validator')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-const adminSchema = new mongoose.Schema({
-  firstname: {
-    type: String,
-    required: [true, "Please provide your first name"],
-    trim: true
-  },
-  lastname: {
-    type: String,
-    required: [false, "Please provide your last name"],
-    trim: true
-  },
-  email: {
-    type: String,
-    unique: true,
-    required: [true, "Please provide your email address"],
-    trim: true,
-    lowercase: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error('Please provide a valid Email')
+const adminSchema = new mongoose.Schema(
+  {
+    firstname: {
+      type: String,
+      required: [true, 'Please provide your first name'],
+      trim: true
+    },
+    lastname: {
+      type: String,
+      required: [false, 'Please provide your last name'],
+      trim: true
+    },
+    email: {
+      type: String,
+      unique: true,
+      required: [true, 'Please provide your email address'],
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Please provide a valid Email');
+        }
       }
+    },
+    password: {
+      type: String,
+      required: [false, 'Please provide password'],
+      minLength: 8,
+      trim: true
+    },
+    phone: {
+      type: Number,
+      required: [false, 'Please provide your phone number'],
+      minLength: 10,
+      maxLength: 10
     }
+    // tokens: [{
+    //   token: {
+    //     type: String,
+    //     required: true
+    //   }
+    // }],
   },
-  password: {
-    type: String,
-    required: [false, "Please provide password"],
-    minLength: 8,
-    trim: true,
-  },
-  phone: {
-    type: Number,
-    required: [false, "Please provide your phone number"],
-    minLength: 10,
-    maxLength: 10
-  },
-  // tokens: [{
-  //   token: {
-  //     type: String,
-  //     required: true
-  //   }
-  // }],
-}, {
-  timestamps: true
-})
+  {
+    timestamps: true
+  }
+);
 
 adminSchema.methods.toJSON = function () {
-  const user = this
+  const user = this;
 
-  const userObject = user.toObject()
-  delete userObject.password
-  delete userObject.tokens
+  const userObject = user.toObject();
+  delete userObject.password;
+  delete userObject.tokens;
 
-  return AdminObject
-}
+  return AdminObject;
+};
 
 adminSchema.methods.generateAuthToken = async function () {
-  const user = this
-  const token = jwt.sign({ _id: user._id }, 'My Secret')
+  const user = this;
+  const token = jwt.sign({ _id: user._id }, 'My Secret');
 
-  user.tokens = user.tokens.concat({ token })
-  await user.save()
-  return token
-}
+  user.tokens = user.tokens.concat({ token });
+  await user.save();
+  return token;
+};
 
 adminSchema.statics.findByCredentials = async (email, password) => {
-  const user = await Admin.findOne({ email })
+  const user = await Admin.findOne({ email });
   if (!user) {
-    throw new Error('Unable to login')
+    throw new Error('Unable to login');
   }
 
   if (password) {
-    const isMatch = await bcrypt.compare(password, user.password)
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new Error('Unable to login')
+      throw new Error('Unable to login');
     }
   }
 
-  return user
-}
+  return user;
+};
 
 adminSchema.statics.updateSchema = async function (id, data) {
-  const user = await Admin.findByIdAndUpdate(id, {
-    ...data,
-  }, { new: true });
-  return user
-}
+  const user = await Admin.findByIdAndUpdate(
+    id,
+    {
+      ...data
+    },
+    { new: true }
+  );
+  return user;
+};
 
 adminSchema.pre('save', async function (next) {
-  const user = this
+  const user = this;
   if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, 8)
+    user.password = await bcrypt.hash(user.password, 8);
   }
-  next()
-})
+  next();
+});
 
-const Admin = mongoose.model('Admin', adminSchema)
+const Admin = mongoose.model('Admin', adminSchema);
 
-module.exports = Admin
+module.exports = Admin;

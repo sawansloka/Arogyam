@@ -6,7 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "lint": "eslint api/**/*.js",
+    "format": "prettier --write 'api/'"
+  },
+  "lint-staged": {
+    "api/**/*.{js,jsx}": [
+      "npm run lint -- --fix",
+      "npm run format"
+    ]
   },
   "repository": {
     "type": "git",
@@ -24,9 +32,18 @@
     "express": "^4.19.2",
     "http-status": "^1.7.4",
     "http-status-codes": "^2.3.0",
+    "husky": "^9.1.4",
     "mongoose": "^8.5.2",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.4",
     "validator": "^13.12.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3"
   }
 }

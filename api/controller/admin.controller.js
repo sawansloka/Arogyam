@@ -1,8 +1,8 @@
-const StatusCodes = require('http-status-codes').StatusCodes;
+const {StatusCodes} = require('http-status-codes');
 const ClinicMetaData = require('../../model/clinicMetaData');
 const CustomerFeedback = require('../../model/customerFeedback');
 
-//Clinic meta data
+// Clinic meta data
 exports.upsertClinicMeta = async (req, res) => {
   try {
     const { bannerUrl, desc, faqs } = req.body;
@@ -11,7 +11,7 @@ exports.upsertClinicMeta = async (req, res) => {
     if (!bannerUrl || !desc || !desc.title || !desc.body) {
       return res.status(StatusCodes.BAD_REQUEST).send({
         status: 'Validation failed',
-        error: 'Banner URL and description (header and body) are required',
+        error: 'Banner URL and description (header and body) are required'
       });
     }
 
@@ -40,14 +40,14 @@ exports.upsertClinicMeta = async (req, res) => {
       await clinicMetaData.save();
     }
 
-    res.status(StatusCodes.CREATED).send({
+    return res.status(StatusCodes.CREATED).send({
       status: 'Clinic meta data upserted successfully',
-      data: clinicMetaData,
+      data: clinicMetaData
     });
   } catch (e) {
-    res.status(StatusCodes.BAD_REQUEST).send({
+    return res.status(StatusCodes.BAD_REQUEST).send({
       status: 'Upsert failed',
-      error: e.message || e,
+      error: e.message || e
     });
   }
 };
@@ -56,34 +56,35 @@ exports.updateClinicMetaData = async (req, res) => {
   try {
     const { metaId } = req.params;
     const existingMetaData = await ClinicMetaData.findById(metaId);
-    if(!existingMetaData) {
+    if (!existingMetaData) {
       throw new Error('Clinic meta data not found');
     }
     const { bannerUrl, desc, faqs } = req.body;
-    if(bannerUrl)
-      existingMetaData.bannerUrl = bannerUrl;
-    if(desc) {
-      if(desc.title)
-        existingMetaData.desc.title = desc.title;
-      if(desc.body && desc.body.length){
-        existingMetaData.desc.body = [ ...existingMetaData.desc.body, ...desc.body ];
+    if (bannerUrl) existingMetaData.bannerUrl = bannerUrl;
+    if (desc) {
+      if (desc.title) existingMetaData.desc.title = desc.title;
+      if (desc.body && desc.body.length) {
+        existingMetaData.desc.body = [
+          ...existingMetaData.desc.body,
+          ...desc.body
+        ];
       }
     }
-    if(faqs && faqs.length){
-      existingMetaData.faqs = [...existingMetaData.faqs,...faqs ];
+    if (faqs && faqs.length) {
+      existingMetaData.faqs = [...existingMetaData.faqs, ...faqs];
     }
     await existingMetaData.save();
-    res.status(StatusCodes.CREATED).send({
+    return res.status(StatusCodes.CREATED).send({
       status: 'Clinic meta data updated successfully',
-      data: existingMetaData,
+      data: existingMetaData
     });
   } catch (err) {
-    res.status(StatusCodes.BAD_REQUEST).send({
+    return res.status(StatusCodes.BAD_REQUEST).send({
       status: 'Updatation failed',
-      error: err.message || err,
+      error: err.message || err
     });
   }
-}
+};
 
 exports.deleteClinicMeta = async (req, res) => {
   try {
@@ -93,38 +94,42 @@ exports.deleteClinicMeta = async (req, res) => {
       throw new Error('Clinic meta data not found');
     }
     const { descBody, faq } = req.body;
-    if(descBody){
-      existingMetaData.desc.body = existingMetaData.desc.body.filter(data => data !== descBody);
+    if (descBody) {
+      existingMetaData.desc.body = existingMetaData.desc.body.filter(
+        (data) => data !== descBody
+      );
     }
-    if(faq){
-      existingMetaData.faqs = existingMetaData.faqs.filter(data => data.id !== faq);
+    if (faq) {
+      existingMetaData.faqs = existingMetaData.faqs.filter(
+        (data) => data.id !== faq
+      );
     }
     await existingMetaData.save();
-    res.status(StatusCodes.OK).send({
+    return res.status(StatusCodes.OK).send({
       status: 'Clinic meta data deleted successfully',
-      data: existingMetaData,
+      data: existingMetaData
     });
   } catch (err) {
-    res.status(StatusCodes.BAD_REQUEST).send({
+    return res.status(StatusCodes.BAD_REQUEST).send({
       status: 'Deletion failed',
-      error: err.message || err,
+      error: err.message || err
     });
   }
-}
+};
 
-//CustomerFeedback data
+// CustomerFeedback data
 exports.listAllFeedbacks = async (req, res) => {
   try {
     const feedbacks = await CustomerFeedback.find();
 
-    res.status(StatusCodes.OK).send({
+    return res.status(StatusCodes.OK).send({
       status: 'Success',
-      data: feedbacks,
+      data: feedbacks
     });
   } catch (e) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Fetch failed',
-      error: e.message || e,
+      error: e.message || e
     });
   }
 };
@@ -137,18 +142,18 @@ exports.getFeedbackById = async (req, res) => {
     if (!feedback) {
       return res.status(StatusCodes.NOT_FOUND).send({
         status: 'Not found',
-        error: 'Feedback not found',
+        error: 'Feedback not found'
       });
     }
 
-    res.status(StatusCodes.OK).send({
+    return res.status(StatusCodes.OK).send({
       status: 'Success',
-      data: feedback,
+      data: feedback
     });
   } catch (e) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Fetch failed',
-      error: e.message || e,
+      error: e.message || e
     });
   }
 };
@@ -163,7 +168,7 @@ exports.updateFeedbackById = async (req, res) => {
     if (!feedback) {
       return res.status(StatusCodes.NOT_FOUND).send({
         status: 'Not found',
-        error: 'Feedback not found',
+        error: 'Feedback not found'
       });
     }
 
@@ -177,14 +182,14 @@ exports.updateFeedbackById = async (req, res) => {
 
     await feedback.save();
 
-    res.status(StatusCodes.OK).send({
+    return res.status(StatusCodes.OK).send({
       status: 'Feedback updated successfully',
-      data: feedback,
+      data: feedback
     });
   } catch (e) {
-    res.status(StatusCodes.BAD_REQUEST).send({
+    return res.status(StatusCodes.BAD_REQUEST).send({
       status: 'Update failed',
-      error: e.message || e,
+      error: e.message || e
     });
   }
 };
@@ -197,19 +202,18 @@ exports.deleteFeedback = async (req, res) => {
     if (!feedback) {
       return res.status(StatusCodes.NOT_FOUND).send({
         status: 'Not found',
-        error: 'Feedback not found',
+        error: 'Feedback not found'
       });
     }
 
-    res.status(StatusCodes.OK).send({
+    return res.status(StatusCodes.OK).send({
       status: 'Deleted',
-      data: feedback,
+      data: feedback
     });
   } catch (e) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Deletion failed',
-      error: e.message || e,
+      error: e.message || e
     });
   }
 };
-
