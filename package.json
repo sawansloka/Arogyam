@@ -10,6 +10,11 @@
     "lint": "eslint api/**/*.js",
     "format": "prettier --write 'api/'"
   },
+  "husky": {
+    "hooks": {
+    "pre-commit": "lint-staged"
+    }
+  },
   "lint-staged": {
     "api/**/*.{js,jsx}": [
       "npm run lint -- --fix",
