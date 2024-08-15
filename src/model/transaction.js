@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 
 const transactionSchema = new mongoose.Schema(
   {
@@ -10,7 +9,7 @@ const transactionSchema = new mongoose.Schema(
     transactionStatus: {
       type: String,
       enum: ['REQUESTED', 'SUCCESS', 'FAILED', 'PENDING'],
-      default: REQUESTED,
+      default: 'REQUESTED',
       required: true
     }
   },

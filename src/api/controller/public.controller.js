@@ -2,9 +2,9 @@ const { StatusCodes } = require('http-status-codes');
 const CustomerFeedback = require('../../model/customerFeedback');
 const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
+const { toIST, checkSlotAvailibility } = require('../../utils/publicHelper');
 
 // Helper function to convert to IST
-const toIST = (date) => new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
 
 // customer data
 exports.createFeedback = async (req, res) => {
@@ -75,6 +75,7 @@ exports.listAvailableSlots = async (req, res) => {
     }
 
     const availableSlots = [];
+    const promises = [];
     const startTime = toIST(new Date(`${date}T${slot.startTime}:00`));
     const endTime = toIST(new Date(`${date}T${slot.endTime}:00`));
     const breakTimes = slot.breakTime.map((b) => ({
@@ -85,40 +86,25 @@ exports.listAvailableSlots = async (req, res) => {
     const currentTime = new Date(startTime);
 
     while (currentTime < endTime) {
-      const isBreak = breakTimes.some(
-        (b) => currentTime >= b.start && currentTime < b.end
-      );
-
-      if (!isBreak) {
+      if (
+        !breakTimes.some((b) => currentTime >= b.start && currentTime < b.end)
+      ) {
         const startOfHour = new Date(currentTime);
-
         const endOfHour = new Date(startOfHour);
         endOfHour.setHours(startOfHour.getHours() + 1);
         endOfHour.setMilliseconds(-1);
 
-        const startOfHourIST = startOfHour;
-        const endOfHourIST = endOfHour;
-
-        const bookedCount = await Patient.countDocuments({
-          appointmentTime: {
-            $gte: startOfHourIST,
-            $lt: endOfHourIST
-          },
-          status: 'Booked'
-        });
-
-        if (bookedCount < slot.maxSlots) {
-          const formattedTime = new Date(
-            currentTime.getTime() - 5.5 * 60 * 60 * 1000
-          )
-            .toTimeString()
-            .split(' ')[0];
-          availableSlots.push(formattedTime);
-        }
+        promises.push(checkSlotAvailibility(startOfHour, endOfHour, slot));
       }
-
       currentTime.setHours(currentTime.getHours() + 1);
     }
+
+    const results = await Promise.all(promises);
+    results.forEach((result) => {
+      if (result.isAvailable) {
+        availableSlots.push(result.formattedTime);
+      }
+    });
 
     return res.status(StatusCodes.OK).send({
       status: 'Success',

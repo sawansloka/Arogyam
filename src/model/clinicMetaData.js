@@ -17,7 +17,7 @@ const clinicMetaDataSchema = new mongoose.Schema(
         type: [String],
         required: [true, 'Body is required'],
         validate: {
-          validator: function (value) {
+          validator(value) {
             return value.length > 0 && value.every((str) => str.length <= 30);
           },
           message:

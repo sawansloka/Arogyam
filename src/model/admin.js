@@ -6,17 +6,17 @@ const jwt = require('jsonwebtoken');
 const adminSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Please provide your name"],
+    required: [true, 'Please provide your name']
   },
   email: {
     type: String,
     unique: true,
-    required: [true, "Please provide your email address"],
+    required: [true, 'Please provide your email address'],
     trim: true,
     lowercase: true,
     validate(value) {
       if (!validator.isEmail(value)) {
-        throw new Error('Please provide a valid Email')
+        throw new Error('Please provide a valid Email');
       }
     },
     password: {
@@ -39,8 +39,7 @@ const adminSchema = new mongoose.Schema({
     // }],
   },
   timestamps: true
-}
-);
+});
 
 adminSchema.methods.toJSON = function () {
   const user = this;
@@ -49,7 +48,7 @@ adminSchema.methods.toJSON = function () {
   delete userObject.password;
   delete userObject.tokens;
 
-  return AdminObject;
+  return userObject;
 };
 
 adminSchema.methods.generateAuthToken = async function () {
