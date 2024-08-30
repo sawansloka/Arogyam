@@ -1,19 +1,18 @@
 const { StatusCodes } = require('http-status-codes');
+const cron = require('node-cron');
+const { toIST } = require('../../utils/publicHelper');
+const { adminSecretKey } = require('../../config/vars');
+
 const ClinicMetaData = require('../../model/clinicMetaData');
 const CustomerFeedback = require('../../model/customerFeedback');
 const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
-
-// Utility function to convert a date to IST
-const toIST = (date) => {
-  const offset = 5.5 * 60 * 60 * 1000; // IST offset from UTC in milliseconds
-  return new Date(date.getTime() + offset);
-};
+const Admin = require('../../model/admin');
 
 // Clinic meta data
 exports.upsertClinicMeta = async (req, res) => {
   try {
-    const { bannerUrl, desc, faqs } = req.body;
+    const { bannerUrl, desc, faqs, schedule } = req.body;
 
     if (!bannerUrl || !desc || !desc.title || !desc.body) {
       return res.status(StatusCodes.BAD_REQUEST).send({
@@ -31,6 +30,24 @@ exports.upsertClinicMeta = async (req, res) => {
       if (faqs) {
         existingMeta.faqs = faqs;
       }
+      if (schedule) {
+        if (schedule.startTime)
+          existingMeta.schedule.startTime = schedule.startTime;
+        if (schedule.endTime) existingMeta.schedule.endTime = schedule.endTime;
+
+        if (schedule.breakTime && schedule.breakTime.length) {
+          existingMeta.schedule.breakTime = schedule.breakTime;
+        }
+
+        if (schedule.maxSlots)
+          existingMeta.schedule.maxSlots = schedule.maxSlots;
+
+        if (typeof schedule.isCronJobEnabled === 'boolean') {
+          existingMeta.schedule.isCronJobEnabled =
+            schedule.isCronJobEnabled || false;
+        }
+      }
+
       clinicMetaData = await existingMeta.save();
     } else {
       clinicMetaData = new ClinicMetaData({
@@ -39,7 +56,8 @@ exports.upsertClinicMeta = async (req, res) => {
           title: desc.title,
           body: desc.body
         },
-        faqs: faqs || []
+        faqs: faqs || [],
+        schedule
       });
       await clinicMetaData.save();
     }
@@ -63,7 +81,7 @@ exports.updateClinicMetaData = async (req, res) => {
     if (!existingMetaData) {
       throw new Error('Clinic meta data not found');
     }
-    const { bannerUrl, desc, faqs } = req.body;
+    const { bannerUrl, desc, faqs, schedule } = req.body;
     if (bannerUrl) existingMetaData.bannerUrl = bannerUrl;
     if (desc) {
       if (desc.title) existingMetaData.desc.title = desc.title;
@@ -77,6 +95,25 @@ exports.updateClinicMetaData = async (req, res) => {
     if (faqs && faqs.length) {
       existingMetaData.faqs = [...existingMetaData.faqs, ...faqs];
     }
+
+    if (schedule) {
+      if (schedule.startTime)
+        existingMetaData.schedule.startTime = schedule.startTime;
+      if (schedule.endTime)
+        existingMetaData.schedule.endTime = schedule.endTime;
+
+      if (schedule.breakTime && schedule.breakTime.length) {
+        existingMetaData.schedule.breakTime = schedule.breakTime;
+      }
+
+      if (schedule.maxSlots)
+        existingMetaData.schedule.maxSlots = schedule.maxSlots;
+
+      if (typeof schedule.isCronJobEnabled === 'boolean') {
+        existingMetaData.schedule.isCronJobEnabled = schedule.isCronJobEnabled;
+      }
+    }
+
     await existingMetaData.save();
     return res.status(StatusCodes.CREATED).send({
       status: 'Clinic meta data updated successfully',
@@ -244,7 +281,98 @@ exports.deleteFeedback = async (req, res) => {
   }
 };
 
-// Appointment
+// schedule slots
+const scheduleCronJob = async () => {
+  try {
+    const clinicMetaData = await ClinicMetaData.findOne({});
+
+    if (clinicMetaData && clinicMetaData.schedule.isCronJobEnabled) {
+      console.log('Cron job is enabled, checking for schedules...');
+
+      const today = new Date();
+      const futureDate = new Date(today.setDate(today.getDate() + 7));
+      futureDate.setUTCHours(0, 0, 0, 0);
+
+      const nextDateUTC = new Date(futureDate);
+      nextDateUTC.setUTCDate(nextDateUTC.getUTCDate() + 1);
+
+      const slotsExist = await Slot.findOne({
+        date: {
+          $gte: futureDate,
+          $lt: nextDateUTC
+        }
+      });
+
+      if (!slotsExist) {
+        const { startTime, endTime, breakTime, maxSlots } =
+          clinicMetaData.schedule;
+
+        const slot = new Slot({
+          date: futureDate,
+          startTime: startTime || '09:00',
+          endTime: endTime || '17:00',
+          breakTime: breakTime.length
+            ? breakTime
+            : [{ start: '12:00', end: '13:00' }],
+          maxSlots: maxSlots || 3
+        });
+
+        await slot.save();
+        console.log('Cron job created a new schedule for the 7th day.');
+      } else {
+        console.log(
+          'Cron job skipped: Schedule already exists for the 7th day.'
+        );
+      }
+    } else {
+      console.log('Cron job is disabled, stopping the job.');
+      job.stop();
+    }
+  } catch (error) {
+    console.error('Error in cron job:', error.message);
+  }
+};
+
+let job = cron.schedule('0 0 * * *', scheduleCronJob, { scheduled: true });
+
+// Function to manually start or stop the cron job from an API
+exports.toggleCronJob = async (req, res) => {
+  try {
+    const { action } = req.body;
+
+    if (!action || !['enable', 'disable'].includes(action)) {
+      return res
+        .status(400)
+        .json({ message: 'Invalid action. Must be "enable" or "disable".' });
+    }
+
+    const clinicMetaData = await ClinicMetaData.findOne({});
+
+    if (!clinicMetaData) {
+      return res.status(404).json({ message: 'Clinic metadata not found.' });
+    }
+
+    if (action === 'enable') {
+      clinicMetaData.schedule.isCronJobEnabled = true;
+      await clinicMetaData.save();
+      job.start();
+      console.log('Cron job enabled.');
+      return res.status(200).json({ message: 'Cron job enabled.' });
+    }
+    if (action === 'disable') {
+      clinicMetaData.schedule.isCronJobEnabled = false;
+      await clinicMetaData.save();
+      job.stop();
+      console.log('Cron job disabled.');
+      return res.status(200).json({ message: 'Cron job disabled.' });
+    }
+    return res.status(400).json({ message: 'Invalid action for cron job.' });
+  } catch (error) {
+    console.error('Error toggling cron job:', error.message);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
 exports.setSchedule = async (req, res) => {
   try {
     const { date, startTime, endTime, breakTime, maxPatientsPerInterval } =
@@ -273,6 +401,114 @@ exports.setSchedule = async (req, res) => {
   }
 };
 
+exports.listSchedules = async (req, res) => {
+  try {
+    const { date } = req.query;
+    const query = {};
+
+    if (date) {
+      const dateStart = new Date(date);
+      dateStart.setUTCHours(0, 0, 0, 0);
+      const dateEnd = new Date(dateStart);
+      dateEnd.setUTCDate(dateStart.getUTCDate() + 1);
+
+      query.date = { $gte: dateStart, $lt: dateEnd };
+    }
+
+    const schedules = await Slot.find(query);
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      data: schedules
+    });
+  } catch (e) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      error: e.message || e
+    });
+  }
+};
+
+exports.getScheduleById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const schedule = await Slot.findById(id);
+
+    if (!schedule) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Schedule not found'
+      });
+    }
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      data: schedule
+    });
+  } catch (e) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      error: e.message || e
+    });
+  }
+};
+
+exports.updateSchedule = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    const updatedSlot = await Slot.findByIdAndUpdate(id, updateData, {
+      new: true
+    });
+
+    if (!updatedSlot) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Schedule not found'
+      });
+    }
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'Schedule updated successfully',
+      data: updatedSlot
+    });
+  } catch (e) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      error: e.message || e
+    });
+  }
+};
+
+exports.deleteSchedule = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedSlot = await Slot.findByIdAndDelete(id);
+
+    if (!deletedSlot) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Schedule not found'
+      });
+    }
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'Schedule deleted successfully'
+    });
+  } catch (e) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      error: e.message || e
+    });
+  }
+};
+
+// Appointment Booking
 exports.listAppointments = async (req, res) => {
   try {
     const { name, date, page = 1, limit = 10 } = req.query;
@@ -370,7 +606,7 @@ exports.editAppointmentById = async (req, res) => {
     const updateData = req.body;
 
     if (updateData.appointmentTime) {
-      updateData.appointmentTime = toIST(new Date(updateData.appointmentTime));
+      updateData.appointmentTime = new Date(updateData.appointmentTime);
     }
 
     const appointment = await Patient.findByIdAndUpdate(id, updateData, {
@@ -384,21 +620,34 @@ exports.editAppointmentById = async (req, res) => {
     }
 
     if (updateData.appointmentTime) {
-      const oldSlot = await Slot.findOne({ appointmentIds: appointment._id });
-      const newSlot = await Slot.findOne({
-        date: toIST(new Date(updateData.appointmentTime))
+      const selectedDateUTC = new Date(updateData.appointmentTime);
+      selectedDateUTC.setUTCHours(0, 0, 0, 0);
+      const nextDayUTC = new Date(selectedDateUTC);
+      nextDayUTC.setUTCDate(selectedDateUTC.getUTCDate() + 1);
+
+      const oldSlot = await Slot.findOne({
+        appointmentIds: { $elemMatch: { _id: appointment._id } }
       });
 
-      if (oldSlot && oldSlot._id.toString() !== newSlot._id.toString()) {
+      const newSlot = await Slot.findOne({
+        date: {
+          $gte: selectedDateUTC,
+          $lt: nextDayUTC
+        }
+      });
+
+      if (
+        oldSlot &&
+        newSlot &&
+        oldSlot._id.toString() !== newSlot._id.toString()
+      ) {
         oldSlot.appointmentIds = oldSlot.appointmentIds.filter(
-          (slotId) => slotId.toString() !== appointment._id.toString()
+          (slotId) => slotId._id.toString() !== appointment._id.toString()
         );
         await oldSlot.save();
 
-        if (newSlot) {
-          newSlot.appointmentIds.push(appointment._id);
-          await newSlot.save();
-        }
+        newSlot.appointmentIds.push({ _id: appointment._id });
+        await newSlot.save();
       }
     }
 
@@ -440,6 +689,103 @@ exports.deleteAppointmentById = async (req, res) => {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
       error: e.message || e
+    });
+  }
+};
+
+// Sign Up
+exports.signUp = async (req, res) => {
+  try {
+    const { name, email, password, phone, key } = req.body;
+
+    if (!name || !email || !password || !phone || !key) {
+      return res.status(StatusCodes.BAD_REQUEST).send({
+        status: 'Error',
+        message: 'All fields are required'
+      });
+    }
+
+    if (key.toString() !== adminSecretKey.toString()) {
+      return res.status(StatusCodes.BAD_REQUEST).send({
+        status: 'Error',
+        message: 'Provide valid key'
+      });
+    }
+
+    const existingAdmin = await Admin.findOne({ email });
+    if (existingAdmin) {
+      return res.status(StatusCodes.CONFLICT).send({
+        status: 'Error',
+        message: 'Admin with this email already exists'
+      });
+    }
+
+    const admin = new Admin({ name, email, password, phone });
+
+    await admin.save();
+    console.log(':adminnn saved');
+    const token = await admin.generateAuthToken();
+    console.log(token, 'tokenn');
+    return res.status(StatusCodes.CREATED).send({
+      status: 'Success',
+      message: 'Admin created successfully',
+      admin: admin.toJSON(),
+      token
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
+// Login API
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(StatusCodes.BAD_REQUEST).send({
+        status: 'Error',
+        message: 'Please provide email and password'
+      });
+    }
+
+    const admin = await Admin.findByCredentials(email, password);
+
+    const token = await admin.generateAuthToken();
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'Admin logged in successfully',
+      admin: admin.toJSON(),
+      token
+    });
+  } catch (error) {
+    return res.status(StatusCodes.UNAUTHORIZED).send({
+      status: 'Error',
+      message: error.message || 'Invalid credentials'
+    });
+  }
+};
+
+// Sign Out API for Admin
+exports.logout = async (req, res) => {
+  try {
+    req.user.tokens = req.user.tokens.filter(
+      (tokenObj) => tokenObj.token !== req.token
+    );
+    await req.user.save();
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'Admin logged out successfully'
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: error.message || 'Internal Server Error'
     });
   }
 };

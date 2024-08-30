@@ -2,21 +2,24 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { jwtSecretKey } = require('../config/vars');
 
-const adminSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Please provide your name']
-  },
-  email: {
-    type: String,
-    unique: true,
-    required: [true, 'Please provide your email address'],
-    trim: true,
-    lowercase: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error('Please provide a valid Email');
+const adminSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'Please provide your name']
+    },
+    email: {
+      type: String,
+      unique: true,
+      required: [true, 'Please provide your email address'],
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Please provide a valid Email');
+        }
       }
     },
     password: {
@@ -30,16 +33,20 @@ const adminSchema = new mongoose.Schema({
       required: [false, 'Please provide your phone number'],
       minLength: 10,
       maxLength: 10
-    }
-    // tokens: [{
-    //   token: {
-    //     type: String,
-    //     required: true
-    //   }
-    // }],
+    },
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true
+        }
+      }
+    ]
   },
-  timestamps: true
-});
+  {
+    timestamps: true
+  }
+);
 
 adminSchema.methods.toJSON = function () {
   const user = this;
@@ -53,8 +60,7 @@ adminSchema.methods.toJSON = function () {
 
 adminSchema.methods.generateAuthToken = async function () {
   const user = this;
-  const token = jwt.sign({ _id: user._id }, 'My Secret');
-
+  const token = jwt.sign({ _id: user._id }, jwtSecretKey, { expiresIn: '2h' });
   user.tokens = user.tokens.concat({ token });
   await user.save();
   return token;
@@ -73,17 +79,6 @@ adminSchema.statics.findByCredentials = async (email, password) => {
     }
   }
 
-  return user;
-};
-
-adminSchema.statics.updateSchema = async function (id, data) {
-  const user = await Admin.findByIdAndUpdate(
-    id,
-    {
-      ...data
-    },
-    { new: true }
-  );
   return user;
 };
 
