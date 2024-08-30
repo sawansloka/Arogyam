@@ -1,10 +1,9 @@
 const { StatusCodes } = require('http-status-codes');
+const { toIST, checkSlotAvailibility } = require('../../utils/publicHelper');
+
 const CustomerFeedback = require('../../model/customerFeedback');
 const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
-const { toIST, checkSlotAvailibility } = require('../../utils/publicHelper');
-
-// Helper function to convert to IST
 
 // customer data
 exports.createFeedback = async (req, res) => {
@@ -136,6 +135,13 @@ exports.bookAppointment = async (req, res) => {
             'An appointment is already booked for this patient in the future.'
         });
       }
+
+      if (existingPatient.status === 'Visited') {
+        existingPatient.visitedAppointmentTime.push(
+          existingPatient.appointmentTime
+        );
+      }
+
       existingPatient.appointmentTime = toIST(new Date(appointmentTime));
       existingPatient.queuePosition =
         (await Patient.countDocuments({
@@ -155,7 +161,7 @@ exports.bookAppointment = async (req, res) => {
 
       return res.status(StatusCodes.OK).send({
         status: 'Success',
-        message: 'Existing appointment updated successfully',
+        message: 'Created new appointment successfully',
         appointmentId: existingPatient._id
       });
     }
@@ -268,8 +274,9 @@ exports.trackAppointmentStatus = async (req, res) => {
   try {
     const { name, phone } = req.query;
 
-    const testDate = new Date('2024-08-16T00:00:00.000Z'); // for testing
-    const todayUTC = new Date(testDate);
+    // For testing purposes, using a fixed date
+    // const testDate = new Date('2024-08-17T00:00:00.000Z'); // for testing
+    const todayUTC = new Date();
     todayUTC.setUTCHours(0, 0, 0, 0);
 
     const tomorrowUTC = new Date(todayUTC);
@@ -285,23 +292,28 @@ exports.trackAppointmentStatus = async (req, res) => {
     });
 
     if (!patient) {
-      return res.status(StatusCodes.NOT_FOUND).send({
-        status: 'Not found',
-        message: 'No appointment found for today'
+      return res.status(StatusCodes.OK).send({
+        status: 'Success',
+        data: {
+          date: todayUTC.toISOString().split('T')[0],
+          time: '',
+          status: 'No appointment found for today',
+          position: 0
+        }
       });
     }
 
-    const position = await Patient.countDocuments({
-      appointmentTime: { $lt: patient.appointmentTime, $gte: todayUTC }
-    });
+    const adjustedAppointmentTime = new Date(
+      patient.appointmentTime.getTime() - 5.5 * 60 * 60 * 1000
+    );
 
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       data: {
         date: patient.appointmentTime.toISOString().split('T')[0],
-        time: patient.appointmentTime.toTimeString().split(' ')[0],
+        time: adjustedAppointmentTime.toTimeString().split(' ')[0],
         status: patient.status,
-        position
+        position: patient.queuePosition
       }
     });
   } catch (e) {

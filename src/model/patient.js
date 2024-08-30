@@ -32,6 +32,10 @@ const patientSchema = new mongoose.Schema(
     isPaid: {
       type: Boolean,
       default: false
+    },
+    visitedAppointmentTime: {
+      type: [Date],
+      default: []
     }
   },
   {
