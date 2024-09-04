@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 
 const patientSchema = new mongoose.Schema(
   {
+    patientId: {
+      type: String,
+      unique: true,
+      required: true,
+      default: generatePatientId
+    },
     name: {
       type: String,
       required: [true, 'Please provide your name'],
@@ -42,6 +48,15 @@ const patientSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+function generatePatientId() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 6; i += 1) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return `PT-${result}`;
+}
 
 const Patient = mongoose.model('Patient', patientSchema);
 

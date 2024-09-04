@@ -1,13 +1,18 @@
 const { StatusCodes } = require('http-status-codes');
 const cron = require('node-cron');
-const { toIST } = require('../../utils/publicHelper');
+const puppeteer = require('puppeteer');
+const ejs = require('ejs');
+const path = require('path');
+const fs = require('fs');
 const { adminSecretKey } = require('../../config/vars');
+const { toIST } = require('../../utils/publicHelper');
 
 const ClinicMetaData = require('../../model/clinicMetaData');
 const CustomerFeedback = require('../../model/customerFeedback');
 const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
 const Admin = require('../../model/admin');
+const Prescription = require('../../model/prescription');
 
 // Clinic meta data
 exports.upsertClinicMeta = async (req, res) => {
@@ -290,6 +295,26 @@ const scheduleCronJob = async () => {
       console.log('Cron job is enabled, checking for schedules...');
 
       const today = new Date();
+
+      // Calculate the date 15 days ago
+      const pastDate = new Date(today);
+      pastDate.setDate(today.getDate() - 15);
+      pastDate.setUTCHours(0, 0, 0, 0);
+
+      // Delete schedules that are 15 days older than today
+      const deletedSlots = await Slot.deleteMany({
+        date: { $lt: pastDate }
+      });
+
+      if (deletedSlots.deletedCount > 0) {
+        console.log(
+          `Cron job deleted ${deletedSlots.deletedCount} schedules older than 15 days.`
+        );
+      } else {
+        console.log('No schedules found that are older than 15 days.');
+      }
+
+      // Calculate the date for the 7th day from today
       const futureDate = new Date(today.setDate(today.getDate() + 7));
       futureDate.setUTCHours(0, 0, 0, 0);
 
@@ -782,6 +807,195 @@ exports.logout = async (req, res) => {
       status: 'Success',
       message: 'Admin logged out successfully'
     });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
+// Patient Prescription
+exports.createPrescription = async (req, res) => {
+  try {
+    const { patientId } = req.body.patient;
+
+    const patient = await Patient.findOne({ patientId });
+
+    // req.body.patient.name = patient.name;
+    // req.body.patient.phone = patient.name;
+
+    if (!patient) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Patient not found'
+      });
+    }
+    console.log(req.body);
+    const prescription = new Prescription(req.body);
+    // await prescription.save();
+
+    return res.status(StatusCodes.CREATED).send({
+      status: 'Success',
+      message: 'Prescription created successfully',
+      data: prescription
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
+exports.getAllPrescriptions = async (req, res) => {
+  try {
+    const prescriptions =
+      await Prescription.find().populate('patientId doctorId');
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'Prescriptions fetched successfully',
+      data: prescriptions
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
+exports.getPrescriptionById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const prescription =
+      await Prescription.findById(id).populate('patientId doctorId');
+
+    if (!prescription) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Prescription not found'
+      });
+    }
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'Prescription fetched successfully',
+      data: prescription
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
+exports.updatePrescription = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const prescription = await Prescription.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true
+    });
+
+    if (!prescription) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Prescription not found'
+      });
+    }
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'Prescription updated successfully',
+      data: prescription
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
+exports.deletePrescription = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const prescription = await Prescription.findByIdAndDelete(id);
+
+    if (!prescription) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Prescription not found'
+      });
+    }
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'Prescription deleted successfully'
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
+exports.generatePrescriptionPDF = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const prescription = await Prescription.findById(id).populate('patientId');
+    console.log(prescription, 'prescripton');
+    if (!prescription) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Prescription not found'
+      });
+    }
+
+    const patient = prescription.patientId;
+    const complaints = prescription.complaints || [];
+    const findings = prescription.findings || [];
+    const { diagnosis } = prescription;
+    const { prescriptionItems } = prescription;
+    const { advice } = prescription;
+    const { followUpDate } = prescription;
+
+    // Render EJS template to HTML
+    const templatePath = path.join(__dirname, '../../views/prescription.ejs');
+    const html = await ejs.renderFile(templatePath, {
+      prescription,
+      patient,
+      complaints,
+      findings,
+      diagnosis,
+      prescriptionItems,
+      advice,
+      followUpDate
+    });
+
+    // Launch Puppeteer and generate PDF
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(html);
+    const pdfBuffer = await page.pdf({ format: 'A4' });
+
+    console.log('PDF Buffer Size:', pdfBuffer.length);
+
+    await browser.close();
+
+    // Save the PDF file to the local drive
+    const pdfPath = path.join(__dirname, '../../views/prescription.pdf');
+    fs.writeFileSync(pdfPath, pdfBuffer);
+
+    console.log(`PDF saved at ${pdfPath}`);
+
+    // Set the content type and send the PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    return res.send(pdfBuffer);
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
