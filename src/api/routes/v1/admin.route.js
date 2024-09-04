@@ -56,4 +56,13 @@ router
 // enable or disable schedule
 router.route('/cron-job').post(adminAuth, adminController.toggleCronJob);
 
+// prescription
+router
+  .route('/prescriptions')
+  .post(adminAuth, adminController.createPrescription);
+
+router
+  .route('/prescriptions/:id/pdf')
+  .get(adminAuth, adminController.generatePrescriptionPDF);
+
 module.exports = router;

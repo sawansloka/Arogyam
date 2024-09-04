@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #fff;
+        }
+        .header, .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header-left, .header-right {
+            width: 30%;
+        }
+        .logo {
+            width: 30%;
+            text-align: center;
+        }
+        .logo img {
+            max-width: 100px; /* Adjust logo size */
+        }
+        .hospital-name {
+            color: blue;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .patient-info, .prescription, .advice, .follow-up {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .section-title {
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 10px;
+        }
+        .complaints-findings {
+            margin-bottom: 20px;
+        }
+        .complaints-findings-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .complaints-findings-table th, .complaints-findings-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            vertical-align: top;
+            text-align: left;
+        }
+        .complaints-findings-table th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+        .prescription-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .prescription-table th, .prescription-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .prescription-table th {
+            background-color: #f2f2f2;
+        }
+        .advice p, .follow-up p {
+            margin: 5px 0;
+        }
+        .footer {
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h2>Dr. Akshara</h2>
+            <p>M.S.</p>
+            <p>Reg. No: MMC 2024</p>
+            <h2>Dr. Mishra</h2>
+            <p>M.S.</p>
+            <p>Reg. No: MMC 2024</p>
+        </div>
+        <div class="logo">
+            <img src="../views/Arogyam_Logo.png" alt="Company Logo" width="150" height="150">
+        </div>
+        <div class="header-right">
+            <h2 class="hospital-name">Arogyam Clinic</h2>
+            <p>B/503, Business Center, MG Road, Manpur</p>
+            <p>Ph: 9828XXXXXX </p>
+            <p>Timing: 9:00 AM - 5:00 PM</p>
+            <p>Closed: Sunday</p>
+        </div>
+    </div>
+
+    <div class="patient-info">
+        <p><strong>ID:</strong> <%= patient.patientId %> / <% patient.name %> / <%= patient.gender || 'N/A' %> / <%= patient.age || 'N/A' %> Y</p>
+        <p><strong>Mob. No:</strong> <%= patient.phone %></p>
+        <p><strong>Address:</strong> <%= patient.address || 'N/A' %></p>
+        <p><strong>Weight (Kg):</strong> <%= patient.weight || 'N/A' %>, <strong>Height (Cm):</strong> <%= patient.height || 'N/A' %>, <strong>BMI:</strong> <%= patient.bmi || 'N/A' %></p>
+        <p><strong>BP:</strong> <%= patient.bp || 'N/A' %></p>
+        <p><strong>Date:</strong> <%= new Date().toLocaleDateString() %></p>
+    </div>
+
+    <!-- Complaints and Findings Section -->
+    <div class="complaints-findings">
+        <table class="complaints-findings-table">
+            <thead>
+                <tr>
+                    <th>Chief Complaints</th>
+                    <th>Clinical Findings</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% const maxRows = Math.max(complaints.length, findings.length); %>
+                <% for (let i = 0; i < maxRows; i++) { %>
+                <tr>
+                    <td><%= complaints[i] || '' %></td>
+                    <td><%= findings[i] || '' %></td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="diagnosis">
+        <p><strong>Diagnosis:</strong> <%= diagnosis %></p>
+    </div>
+
+    <div class="prescription">
+        <div class="section-title">Prescription</div>
+        <table class="prescription-table">
+            <thead>
+                <tr>
+                    <th>Drug Name</th>
+                    <th>Potency</th>
+                    <th>Dosage</th>
+                  <th>Repitition</th>
+                  <th>Qty</th>
+                  <th>Period</th>
+                  <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% prescriptionItems.forEach(function(item) { %>
+                <tr>
+                    <td><%= item.drugName %></td>
+                    <td><%= item.potency %></td>
+                    <td><%= item.dosage %></td>
+                    <td><%= item.repitition %></td>
+                    <td><%= item.qty %></td>
+                    <td><%= item.period %></td>
+                    <td><%= item.remarks %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="advice">
+        <div class="section-title">Advice</div>
+        <!-- <p><%= advice.join('<br>') %></p> -->
+        <% advice.forEach(function(item) { %>
+            <tr>
+              <%= item %>
+            </tr>
+            <% }) %>
+    </div>
+
+    <div class="follow-up">
+        <div class="section-title">Follow Up</div>
+        <p><strong>Date:</strong> <%= followUpDate %></p>
+    </div>
+
+    <div class="footer">
+        Substitute with equivalent Generics as required.
+    </div>
+</body>
+</html>
