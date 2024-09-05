@@ -3,7 +3,8 @@ const cron = require('node-cron');
 const puppeteer = require('puppeteer');
 const ejs = require('ejs');
 const path = require('path');
-const fs = require('fs');
+const { google } = require('googleapis');
+const stream = require('stream');
 const { adminSecretKey } = require('../../config/vars');
 const { toIST } = require('../../utils/publicHelper');
 
@@ -13,6 +14,8 @@ const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
 const Admin = require('../../model/admin');
 const Prescription = require('../../model/prescription');
+
+const CREDENTIALS_PATH = path.join(__dirname, '../../../credentials.json');
 
 // Clinic meta data
 exports.upsertClinicMeta = async (req, res) => {
@@ -822,8 +825,8 @@ exports.createPrescription = async (req, res) => {
 
     const patient = await Patient.findOne({ patientId });
 
-    // req.body.patient.name = patient.name;
-    // req.body.patient.phone = patient.name;
+    req.body.patient.name = patient.name;
+    req.body.patient.phone = patient.phone;
 
     if (!patient) {
       return res.status(StatusCodes.NOT_FOUND).send({
@@ -831,9 +834,9 @@ exports.createPrescription = async (req, res) => {
         message: 'Patient not found'
       });
     }
-    console.log(req.body);
+
     const prescription = new Prescription(req.body);
-    // await prescription.save();
+    await prescription.save();
 
     return res.status(StatusCodes.CREATED).send({
       status: 'Success',
@@ -869,8 +872,7 @@ exports.getAllPrescriptions = async (req, res) => {
 exports.getPrescriptionById = async (req, res) => {
   try {
     const { id } = req.params;
-    const prescription =
-      await Prescription.findById(id).populate('patientId doctorId');
+    const prescription = await Prescription.findById(id);
 
     if (!prescription) {
       return res.status(StatusCodes.NOT_FOUND).send({
@@ -944,10 +946,64 @@ exports.deletePrescription = async (req, res) => {
   }
 };
 
+// Google Drive Setup
+async function uploadToGoogleDrive(pdfBuffer, fileName) {
+  const auth = new google.auth.GoogleAuth({
+    keyFile: CREDENTIALS_PATH,
+    scopes: ['https://www.googleapis.com/auth/drive.file']
+  });
+
+  const drive = google.drive({ version: 'v3', auth });
+
+  const fileMetadata = {
+    name: fileName,
+    parents: ['10pBVAO7MnCdbBaTNLa8vlidqxIvwHu1U'] // Optional: Folder ID to save the file in a specific folder
+  };
+
+  // Convert the Uint8Array to a Buffer
+  const bufferStream = new stream.PassThrough();
+  bufferStream.end(pdfBuffer);
+
+  const media = {
+    mimeType: 'application/pdf',
+    body: bufferStream
+  };
+
+  try {
+    const response = await drive.files.create({
+      resource: fileMetadata,
+      media,
+      fields: 'id'
+    });
+
+    const fileId = response.data.id;
+
+    // Generate a public link
+    await drive.permissions.create({
+      fileId,
+      requestBody: {
+        role: 'reader',
+        type: 'anyone'
+      }
+    });
+
+    // Get the public URL
+    const result = await drive.files.get({
+      fileId,
+      fields: 'webViewLink, webContentLink'
+    });
+
+    return result.data.webViewLink; // Returns the link to view the file
+  } catch (error) {
+    console.error('Error uploading file to Google Drive:', error.message);
+    throw new Error('Failed to upload file to Google Drive');
+  }
+}
+
 exports.generatePrescriptionPDF = async (req, res) => {
   try {
     const { id } = req.params;
-    const prescription = await Prescription.findById(id).populate('patientId');
+    const prescription = await Prescription.findById(id);
     console.log(prescription, 'prescripton');
     if (!prescription) {
       return res.status(StatusCodes.NOT_FOUND).send({
@@ -956,7 +1012,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
       });
     }
 
-    const patient = prescription.patientId;
+    const { patient } = prescription;
     const complaints = prescription.complaints || [];
     const findings = prescription.findings || [];
     const { diagnosis } = prescription;
@@ -988,14 +1044,34 @@ exports.generatePrescriptionPDF = async (req, res) => {
     await browser.close();
 
     // Save the PDF file to the local drive
-    const pdfPath = path.join(__dirname, '../../views/prescription.pdf');
-    fs.writeFileSync(pdfPath, pdfBuffer);
+    // const pdfPath = path.join(__dirname, '../../views/prescription.pdf');
+    // fs.writeFileSync(pdfPath, pdfBuffer);
 
-    console.log(`PDF saved at ${pdfPath}`);
+    // Upload to Google Drive and get the link
+    const pdfLink = await uploadToGoogleDrive(
+      pdfBuffer,
+      `${patient.patientId}-${patient.name}-prescription.pdf`
+    );
+    console.log(`PDF uploaded to Google Drive with link: ${pdfLink}`);
 
-    // Set the content type and send the PDF
-    res.setHeader('Content-Type', 'application/pdf');
-    return res.send(pdfBuffer);
+    const existingPatient = await Patient.findOne({
+      patientId: patient.patientId
+    });
+
+    if (existingPatient.prescriptionUrl) {
+      existingPatient.visitedPrescriptionUrls.push(
+        existingPatient.prescriptionUrl
+      );
+    }
+    existingPatient.prescriptionUrl = pdfLink;
+
+    await existingPatient.save();
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'PDF generated successfully',
+      pdfLink
+    });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
