@@ -42,6 +42,14 @@ const patientSchema = new mongoose.Schema(
     visitedAppointmentTime: {
       type: [Date],
       default: []
+    },
+    prescriptionUrl: {
+      type: String,
+      default: null
+    },
+    visitedPrescriptionUrls: {
+      type: [String],
+      default: []
     }
   },
   {

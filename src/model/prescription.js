@@ -5,7 +5,7 @@ const prescriptionSchema = new mongoose.Schema({
     patientId: { type: String, required: true },
     name: { type: String },
     phone: { type: Number },
-    gender: { btype: String },
+    gender: { type: String },
     age: { type: Number },
     weight: { type: Number },
     height: { type: Number },
