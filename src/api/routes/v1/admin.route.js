@@ -1,6 +1,5 @@
 const express = require('express');
 const adminController = require('../../controller/admin.controller');
-const commonController = require('../../controller/common.controller');
 const adminAuth = require('../../middleware/adminAuth');
 
 const router = express.Router();
@@ -10,13 +9,15 @@ router.route('/signup').post(adminController.signUp);
 
 router.route('/login').post(adminController.login);
 
+router.route('/forgot-password').post(adminController.forgotPassword);
+
 router.route('/logout').post(adminAuth, adminController.logout);
 
 // Clinic meta data
 router
   .route('/clinic-meta')
   .post(adminAuth, adminController.upsertClinicMeta)
-  .get(adminAuth, commonController.getClinicMeta);
+  .get(adminAuth, adminController.getClinicMeta);
 
 router
   .route('/clinic-meta/:metaId')
@@ -62,7 +63,7 @@ router
   .post(adminAuth, adminController.createPrescription);
 
 router
-  .route('/prescriptions/:id/pdf')
+  .route('/prescriptions/pdf')
   .get(adminAuth, adminController.generatePrescriptionPDF);
 
 module.exports = router;
