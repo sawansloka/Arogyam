@@ -82,6 +82,29 @@ exports.upsertClinicMeta = async (req, res) => {
   }
 };
 
+exports.getClinicMeta = async (req, res) => {
+  try {
+    const clinicMetaData = await ClinicMetaData.findOne();
+
+    if (!clinicMetaData) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Not found',
+        error: 'Clinic meta data not found'
+      });
+    }
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      data: clinicMetaData
+    });
+  } catch (e) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Fetch failed',
+      error: e.message || e
+    });
+  }
+};
+
 exports.updateClinicMetaData = async (req, res) => {
   try {
     const { metaId } = req.params;
@@ -751,9 +774,9 @@ exports.signUp = async (req, res) => {
     const admin = new Admin({ name, email, password, phone });
 
     await admin.save();
-    console.log(':adminnn saved');
+
     const token = await admin.generateAuthToken();
-    console.log(token, 'tokenn');
+
     return res.status(StatusCodes.CREATED).send({
       status: 'Success',
       message: 'Admin created successfully',
@@ -809,6 +832,48 @@ exports.logout = async (req, res) => {
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       message: 'Admin logged out successfully'
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
+// Forgot Password API
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { phone, key, newPassword } = req.body;
+
+    if (!phone || !key || !newPassword) {
+      return res.status(StatusCodes.BAD_REQUEST).send({
+        status: 'Error',
+        message: 'Phone, key, and new password are required'
+      });
+    }
+
+    if (key.toString() !== adminSecretKey.toString()) {
+      return res.status(StatusCodes.BAD_REQUEST).send({
+        status: 'Error',
+        message: 'Provide valid key'
+      });
+    }
+
+    const admin = await Admin.findOne({ phone });
+    if (!admin) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Admin with this phone number does not exist'
+      });
+    }
+
+    admin.password = newPassword;
+    await admin.save();
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'Password updated successfully'
     });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
@@ -1002,9 +1067,12 @@ async function uploadToGoogleDrive(pdfBuffer, fileName) {
 
 exports.generatePrescriptionPDF = async (req, res) => {
   try {
-    const { id } = req.params;
-    const prescription = await Prescription.findById(id);
-    console.log(prescription, 'prescripton');
+    const { patientId } = req.query;
+
+    const prescription = await Prescription.findOne({
+      'patient.patientId': patientId
+    });
+
     if (!prescription) {
       return res.status(StatusCodes.NOT_FOUND).send({
         status: 'Error',
@@ -1039,13 +1107,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
     await page.setContent(html);
     const pdfBuffer = await page.pdf({ format: 'A4' });
 
-    console.log('PDF Buffer Size:', pdfBuffer.length);
-
     await browser.close();
-
-    // Save the PDF file to the local drive
-    // const pdfPath = path.join(__dirname, '../../views/prescription.pdf');
-    // fs.writeFileSync(pdfPath, pdfBuffer);
 
     // Upload to Google Drive and get the link
     const pdfLink = await uploadToGoogleDrive(

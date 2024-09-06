@@ -1,9 +1,34 @@
 const { StatusCodes } = require('http-status-codes');
 const { toIST, checkSlotAvailibility } = require('../../utils/publicHelper');
 
+const ClinicMetaData = require('../../model/clinicMetaData');
 const CustomerFeedback = require('../../model/customerFeedback');
 const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
+
+// Clinic Home Data
+exports.getClinicMeta = async (req, res) => {
+  try {
+    const clinicMetaData = await ClinicMetaData.findOne().select('-schedule');
+
+    if (!clinicMetaData) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Not found',
+        error: 'Clinic meta data not found'
+      });
+    }
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      data: clinicMetaData
+    });
+  } catch (e) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Fetch failed',
+      error: e.message || e
+    });
+  }
+};
 
 // customer data
 exports.createFeedback = async (req, res) => {
@@ -20,8 +45,7 @@ exports.createFeedback = async (req, res) => {
     await feedback.save();
 
     return res.status(StatusCodes.CREATED).send({
-      status: 'Feedback created successfully',
-      data: feedback
+      message: 'Feedback uploaded successfully'
     });
   } catch (e) {
     return res.status(StatusCodes.BAD_REQUEST).send({
@@ -33,7 +57,9 @@ exports.createFeedback = async (req, res) => {
 
 exports.getTestimonials = async (req, res) => {
   try {
-    const testimonials = await CustomerFeedback.find({ isTestimonial: true });
+    const testimonials = await CustomerFeedback.find({
+      isTestimonial: true
+    }).select('-isTestimonial');
 
     const allVideoUrls = testimonials.flatMap(
       (testimonial) => testimonial.videoUrls || []
@@ -56,6 +82,13 @@ exports.getTestimonials = async (req, res) => {
 exports.listAvailableSlots = async (req, res) => {
   try {
     const { date } = req.query;
+
+    if (!date) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Please provide date'
+      });
+    }
 
     const selectedDate = new Date(date);
 
@@ -321,5 +354,52 @@ exports.trackAppointmentStatus = async (req, res) => {
       status: 'Tracking failed',
       error: e.message || e
     });
+  }
+};
+
+// Patient Portal
+exports.patientPortal = async (req, res) => {
+  try {
+    const { patientId, phone } = req.body;
+
+    if (!patientId || !phone) {
+      return res.status(StatusCodes.BAD_REQUEST).send({
+        status: 'Error',
+        message: 'Please provide patient Id and phone'
+      });
+    }
+
+    const patientData = await Patient.findOne({ patientId, phone });
+
+    if (!patientData) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    let payment = 'Pending';
+
+    if (patientData.status.toString() !== 'Booked') {
+      patientData.appointmentTime = null;
+    }
+
+    if (patientData.isPaid) {
+      payment = 'Paid';
+    }
+
+    const response = {
+      patientId: patientData.patientId,
+      name: patientData.name,
+      phone: patientData.phone,
+      appointmentTime: patientData.appointmentTime,
+      queuePosition: patientData.queuePosition,
+      payment,
+      visitedAppointmentTime: patientData.visitedAppointmentTime || null,
+      prescriptionUrl: patientData.prescriptionUrl || null,
+      visitedPrescriptionUrls: patientData.visitedPrescriptionUrls || null
+    };
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error('Error fetching patient data:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
