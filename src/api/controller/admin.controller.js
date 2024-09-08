@@ -1080,13 +1080,10 @@ exports.generatePrescriptionPDF = async (req, res) => {
       });
     }
 
-    const { patient } = prescription;
+    const { patient, diagnosis, prescriptionItems, advice, followUpDate } =
+      prescription;
     const complaints = prescription.complaints || [];
     const findings = prescription.findings || [];
-    const { diagnosis } = prescription;
-    const { prescriptionItems } = prescription;
-    const { advice } = prescription;
-    const { followUpDate } = prescription;
 
     // Render EJS template to HTML
     const templatePath = path.join(__dirname, '../../views/prescription.ejs');

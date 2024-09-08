@@ -14,9 +14,8 @@ const prescriptionSchema = new mongoose.Schema({
     address: { type: String }
   },
   diagnosis: {
-    type: String,
-    required: true,
-    trim: true
+    type: [String],
+    default: []
   },
   complaints: {
     type: [String],
