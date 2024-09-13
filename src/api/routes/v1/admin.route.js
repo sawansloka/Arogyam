@@ -66,4 +66,8 @@ router
   .route('/prescriptions/pdf')
   .post(adminController.generatePrescriptionPDF);
 
+router
+  .route('/get-patient-data/:id')
+  .get(adminAuth, adminController.getPatientData);
+
 module.exports = router;

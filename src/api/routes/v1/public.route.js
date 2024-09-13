@@ -19,6 +19,6 @@ router.route('/appointments').post(publicController.bookAppointment);
 router.route('/track-status').get(publicController.trackAppointmentStatus);
 
 // Patient Portal
-router.route('/patient-portal').post(publicController.patientPortal);
+router.route('/patient-portal').get(publicController.patientPortal);
 
 module.exports = router;

@@ -1138,3 +1138,29 @@ exports.generatePrescriptionPDF = async (req, res) => {
     });
   }
 };
+
+exports.getPatientData = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const prescription = await Prescription.findOne({
+      'patient.patientId': id
+    });
+    if (!prescription) {
+      return res.status(StatusCodes.OK).send({
+        status: 'Success',
+        message: 'This is a new patient',
+        patient: null
+      });
+    }
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'This is an existing patient',
+      patient: prescription.patient
+    });
+  } catch (err) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: err.message || 'Internal Server Error'
+    });
+  }
+};

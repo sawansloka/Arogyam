@@ -28,7 +28,7 @@ const patientSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Booked', 'Visited', 'Cancelled'],
+      enum: ['Booked', 'INPROGRESS', 'Visited', 'Cancelled'],
       default: 'Booked'
     },
     queuePosition: {
