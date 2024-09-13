@@ -169,7 +169,7 @@ exports.bookAppointment = async (req, res) => {
         });
       }
 
-      if (existingPatient.status === 'Visited') {
+      if (existingPatient.status === 'VISITED') {
         existingPatient.visitedAppointmentTime.push(
           existingPatient.appointmentTime
         );
@@ -189,7 +189,7 @@ exports.bookAppointment = async (req, res) => {
             )
           }
         })) + 1;
-      existingPatient.status = 'Booked';
+      existingPatient.status = 'BOOKED';
       await existingPatient.save();
 
       return res.status(StatusCodes.OK).send({
@@ -321,7 +321,7 @@ exports.trackAppointmentStatus = async (req, res) => {
       name,
       phone: phoneNumber,
       appointmentTime: { $gte: todayUTC, $lt: tomorrowUTC },
-      status: 'Booked'
+      status: 'BOOKED'
     });
 
     if (!patient) {
@@ -377,7 +377,7 @@ exports.patientPortal = async (req, res) => {
 
     let payment = 'Pending';
 
-    if (patientData.status.toString() !== 'Booked') {
+    if (patientData.status.toString() !== 'BOOKED') {
       patientData.appointmentTime = null;
     }
 

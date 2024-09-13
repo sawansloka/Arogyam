@@ -8,7 +8,7 @@ exports.checkSlotAvailibility = async (startOfHour, endOfHour, slot) => {
       $gte: startOfHour,
       $lt: endOfHour
     },
-    status: 'Booked'
+    status: 'BOOKED'
   });
 
   const isAvailable = bookedCount < slot.maxSlots;
