@@ -274,7 +274,7 @@ exports.bookAppointment = async (req, res) => {
       phone,
       email,
       appointmentTime: appointmentTimeIST,
-      status: 'Booked',
+      status: 'BOOKED',
       queuePosition: bookedCount + 1
     });
 
