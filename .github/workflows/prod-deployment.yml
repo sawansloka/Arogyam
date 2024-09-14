@@ -1,0 +1,24 @@
+name: Deploy to DigitalOcean App Platform
+
+on:
+  workflow_run:
+    workflows: ["Docker Image CI"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.head_branch == 'main' || github.event.workflow_run.head_branch == 'master') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: dop_v1_176762bf5f5e32437f4300301686da5be211402e48448dbba172f86e1ff72d3c
+
+      - name: Create a new deployment
+        run: doctl apps create-deployment 489d8068-d4ad-49ef-b6e6-4e10d1c2f047
