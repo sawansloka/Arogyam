@@ -1,8 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
 const cron = require('node-cron');
-const puppeteer = require('puppeteer');
-const ejs = require('ejs');
-const path = require('path');
 const jwt = require('jsonwebtoken');
 const { adminSecretKey, jwtSecretKey } = require('../../config/vars');
 const { toIST } = require('../../utils/publicHelper');
@@ -13,6 +10,7 @@ const Slot = require('../../model/slot');
 const Admin = require('../../model/admin');
 const Prescription = require('../../model/prescription');
 const { uploadToGoogleDrive } = require('../../utils/googleHelper');
+const { renderPdf } = require('../../utils/renderFile');
 
 // Clinic meta data
 exports.upsertClinicMeta = async (req, res) => {
@@ -1049,31 +1047,15 @@ exports.generatePrescriptionPDF = async (req, res) => {
       });
     }
 
-    const { patient, diagnosis, prescriptionItems, advice, followUpDate } =
-      prescription;
-    const complaints = prescription.complaints || [];
-    const findings = prescription.findings || [];
+    const { patient } = prescription;
+    prescription.complaints = prescription.complaints || [];
+    prescription.findings = prescription.findings || [];
 
-    // Render EJS template to HTML
-    const templatePath = path.join(__dirname, '../../views/prescription.ejs');
-    const html = await ejs.renderFile(templatePath, {
-      prescription,
-      patient,
-      complaints,
-      findings,
-      diagnosis,
-      prescriptionItems,
-      advice,
-      followUpDate
-    });
-
-    // Launch Puppeteer and generate PDF
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.setContent(html);
-    const pdfBuffer = await page.pdf({ format: 'A4' });
-
-    await browser.close();
+    // Generate PDF buffer
+    const pdfBuffer = await renderPdf(
+      'src/views/prescription.ejs',
+      prescription
+    );
 
     // Upload to Google Drive and get the link
     const pdfLink = await uploadToGoogleDrive(
