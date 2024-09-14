@@ -5,7 +5,8 @@ const ejs = require('ejs');
 const path = require('path');
 const { google } = require('googleapis');
 const stream = require('stream');
-const { adminSecretKey } = require('../../config/vars');
+const jwt = require('jsonwebtoken');
+const { adminSecretKey, jwtSecretKey } = require('../../config/vars');
 const { toIST } = require('../../utils/publicHelper');
 
 const ClinicMetaData = require('../../model/clinicMetaData');
@@ -879,6 +880,32 @@ exports.forgotPassword = async (req, res) => {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
       message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
+exports.jwtValidate = async (req, res) => {
+  try {
+    const token = req.header('Authorization').replace('Bearer ', '');
+    const decoded = jwt.verify(token, jwtSecretKey);
+    const admin = await Admin.findOne({
+      _id: decoded._id,
+      'tokens.token': token
+    });
+    if (!admin) {
+      return res.status(StatusCodes.UNAUTHORIZED).send({
+        status: 'Error',
+        message: 'Token is not valid'
+      });
+    }
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'Token validated successfully'
+    });
+  } catch (err) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: err.message || 'Internal Server Error'
     });
   }
 };

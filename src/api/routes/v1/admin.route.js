@@ -13,6 +13,8 @@ router.route('/forgot-password').post(adminController.forgotPassword);
 
 router.route('/logout').post(adminAuth, adminController.logout);
 
+router.route('/jwtvalidate').post(adminController.jwtValidate);
+
 // Clinic meta data
 router
   .route('/clinic-meta')
