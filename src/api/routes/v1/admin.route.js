@@ -1,6 +1,7 @@
 const express = require('express');
 const adminController = require('../../controller/admin.controller');
 const adminAuth = require('../../middleware/adminAuth');
+const { upload } = require('../../middleware/upload');
 
 const router = express.Router();
 
@@ -23,7 +24,11 @@ router
 
 router
   .route('/clinic-meta/:metaId')
-  .put(adminAuth, adminController.updateClinicMetaData)
+  .put(
+    adminAuth,
+    upload().single('bannerUrl'),
+    adminController.updateClinicMetaData
+  )
   .delete(adminAuth, adminController.deleteClinicMeta);
 
 // Customer Feedback data

@@ -110,7 +110,7 @@ exports.updateClinicMetaData = async (req, res) => {
     if (!existingMetaData) {
       throw new Error('Clinic meta data not found');
     }
-    const { bannerUrl, desc, faqs, schedule } = req.body;
+    const { bannerUrl, title, body, question, answer, schedule } = req.body;
     if (bannerUrl) {
       existingMetaData.bannerUrl = await uploadImageToGoogleDrive(
         bannerUrl,
@@ -118,17 +118,12 @@ exports.updateClinicMetaData = async (req, res) => {
       );
       // existingMetaData.bannerUrl = bannerUrl;
     }
-    if (desc) {
-      if (desc.title) existingMetaData.desc.title = desc.title;
-      if (desc.body && desc.body.length) {
-        existingMetaData.desc.body = [
-          ...existingMetaData.desc.body,
-          ...desc.body
-        ];
-      }
+    if (title) existingMetaData.desc.title = title;
+    if (body) {
+      existingMetaData.desc.body = [...existingMetaData.desc.body, body];
     }
-    if (faqs && faqs.length) {
-      existingMetaData.faqs = [...existingMetaData.faqs, ...faqs];
+    if (question && answer) {
+      existingMetaData.faqs = [...existingMetaData.faqs, { question, answer }];
     }
 
     if (schedule) {
