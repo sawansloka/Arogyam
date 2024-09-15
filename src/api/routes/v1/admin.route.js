@@ -65,6 +65,10 @@ router
   .post(adminAuth, adminController.createPrescription);
 
 router
+  .route('/prescriptions/:id')
+  .put(adminAuth, adminController.updatePrescription);
+
+router
   .route('/prescriptions/pdf')
   .post(adminController.generatePrescriptionPDF);
 
