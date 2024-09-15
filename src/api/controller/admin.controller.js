@@ -9,7 +9,10 @@ const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
 const Admin = require('../../model/admin');
 const Prescription = require('../../model/prescription');
-const { uploadToGoogleDrive } = require('../../utils/googleHelper');
+const {
+  uploadPdfToGoogleDrive,
+  uploadImageToGoogleDrive
+} = require('../../utils/googleHelper');
 const { renderPdf } = require('../../utils/renderFile');
 
 // Clinic meta data
@@ -108,7 +111,13 @@ exports.updateClinicMetaData = async (req, res) => {
       throw new Error('Clinic meta data not found');
     }
     const { bannerUrl, desc, faqs, schedule } = req.body;
-    if (bannerUrl) existingMetaData.bannerUrl = bannerUrl;
+    if (bannerUrl) {
+      existingMetaData.bannerUrl = await uploadImageToGoogleDrive(
+        bannerUrl,
+        'banner.png'
+      );
+      // existingMetaData.bannerUrl = bannerUrl;
+    }
     if (desc) {
       if (desc.title) existingMetaData.desc.title = desc.title;
       if (desc.body && desc.body.length) {
@@ -1058,7 +1067,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
     );
 
     // Upload to Google Drive and get the link
-    const pdfLink = await uploadToGoogleDrive(
+    const pdfLink = await uploadPdfToGoogleDrive(
       pdfBuffer,
       `${patient.patientId}-${patient.name}-prescription.pdf`
     );

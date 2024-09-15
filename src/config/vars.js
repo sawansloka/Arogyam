@@ -9,5 +9,6 @@ module.exports = {
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   redirectUri: process.env.GOOGLE_REDIRECT_URL,
   refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
-  folderId: process.env.GOOGLE_DRIVE_FOLDER_ID
+  prescriptionFolderId: process.env.GOOGLE_DRIVE_PRESCRIPTION_FOLDER_ID,
+  metaImageFolderId: process.env.GOOGLE_DRIVE_METADATA_FOLDER_ID
 };
