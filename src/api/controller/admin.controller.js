@@ -1109,6 +1109,7 @@ exports.getPatientData = async (req, res) => {
       status: 'Success',
       message: 'This is an existing patient',
       patient: {
+        id: prescription.id,
         ...prescription.patient,
         diagnosis: prescription.diagnosis
       }
