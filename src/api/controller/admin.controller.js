@@ -1095,7 +1095,9 @@ exports.getPatientData = async (req, res) => {
     const { id } = req.params;
     const prescription = await Prescription.findOne({
       'patient.patientId': id
-    });
+    })
+      .sort({ createdDate: -1 })
+      .exec();
     if (!prescription) {
       return res.status(StatusCodes.OK).send({
         status: 'Success',
@@ -1106,7 +1108,10 @@ exports.getPatientData = async (req, res) => {
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       message: 'This is an existing patient',
-      patient: prescription.patient
+      patient: {
+        ...prescription.patient,
+        diagnosis: prescription.diagnosis
+      }
     });
   } catch (err) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
