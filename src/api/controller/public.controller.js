@@ -360,7 +360,7 @@ exports.trackAppointmentStatus = async (req, res) => {
 // Patient Portal
 exports.patientPortal = async (req, res) => {
   try {
-    const { patientId, phone } = req.body;
+    const { patientId, phone } = req.query;
 
     if (!patientId || !phone) {
       return res.status(StatusCodes.BAD_REQUEST).send({
