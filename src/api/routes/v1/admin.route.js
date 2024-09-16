@@ -1,7 +1,7 @@
 const express = require('express');
 const adminController = require('../../controller/admin.controller');
 const adminAuth = require('../../middleware/adminAuth');
-const { upload } = require('../../middleware/upload');
+const { uploadSimple } = require('../../middleware/multer');
 
 const router = express.Router();
 
@@ -26,7 +26,7 @@ router
   .route('/clinic-meta/:metaId')
   .put(
     adminAuth,
-    upload().single('bannerUrl'),
+    uploadSimple.single('bannerUrl'),
     adminController.updateClinicMetaData
   )
   .delete(adminAuth, adminController.deleteClinicMeta);

@@ -1,7 +1,11 @@
 const { StatusCodes } = require('http-status-codes');
 const cron = require('node-cron');
 const jwt = require('jsonwebtoken');
-const { adminSecretKey, jwtSecretKey } = require('../../config/vars');
+const {
+  adminSecretKey,
+  jwtSecretKey,
+  digitalOceanService
+} = require('../../config/vars');
 const { toIST } = require('../../utils/publicHelper');
 const ClinicMetaData = require('../../model/clinicMetaData');
 const CustomerFeedback = require('../../model/customerFeedback');
@@ -11,6 +15,7 @@ const Admin = require('../../model/admin');
 const Prescription = require('../../model/prescription');
 const { uploadPdfToGoogleDrive } = require('../../utils/googleHelper');
 const { renderPdf } = require('../../utils/renderFile');
+const { uploadToS3 } = require('../../utils/s3');
 
 // Clinic meta data
 exports.upsertClinicMeta = async (req, res) => {
@@ -109,7 +114,9 @@ exports.updateClinicMetaData = async (req, res) => {
     }
     const { filename, title, body, question, answer, schedule } = req.body;
     if (filename) {
-      existingMetaData.bannerUrl = filename;
+      const fileBuffer = req.file.buffer;
+      await uploadToS3(fileBuffer, filename);
+      existingMetaData.bannerUrl = `${digitalOceanService.originUrl}/${filename}`;
     }
     if (title) existingMetaData.desc.title = title;
     if (body) {
