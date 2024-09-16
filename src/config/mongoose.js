@@ -2,10 +2,7 @@ const mongoose = require('mongoose');
 const { dbUri } = require('./vars');
 
 mongoose
-  .connect(dbUri, {
-    useNewUrlParser: true
-    // useCreateIndex: true
-  })
+  .connect(dbUri)
   .then(() =>
     console.log('MongoDB database connection established successfully')
   )

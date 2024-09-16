@@ -1,12 +1,10 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 
 const clinicMetaDataSchema = new mongoose.Schema(
   {
     bannerUrl: {
       type: String,
-      required: true,
-      validate: [validator.isURL, 'Invalid URL format']
+      required: [true, 'Banner filename is required']
     },
     desc: {
       title: {

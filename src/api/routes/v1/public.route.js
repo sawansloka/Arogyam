@@ -6,6 +6,8 @@ const router = express.Router();
 // Clinic meta data
 router.route('/clinic-meta').get(publicController.getClinicMeta);
 
+router.route('/clinic-meta/banner').get(publicController.getClinicMetaBanner);
+
 // Customer feedback
 router.route('/feedbacks').post(publicController.createFeedback);
 

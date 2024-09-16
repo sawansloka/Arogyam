@@ -5,6 +5,7 @@ const ClinicMetaData = require('../../model/clinicMetaData');
 const CustomerFeedback = require('../../model/customerFeedback');
 const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
+const { getImage } = require('../../utils/gridFsHelper');
 
 // Clinic Home Data
 exports.getClinicMeta = async (req, res) => {
@@ -26,6 +27,20 @@ exports.getClinicMeta = async (req, res) => {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Fetch failed',
       error: e.message || e
+    });
+  }
+};
+
+exports.getClinicMetaBanner = async (req, res) => {
+  try {
+    const { filename } = req.query;
+    const stream = await getImage(filename);
+    res.set('Content-Type', 'image/*');
+    stream.pipe(res);
+  } catch (err) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Fetch failed',
+      error: err.message || err
     });
   }
 };

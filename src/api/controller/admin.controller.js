@@ -9,10 +9,7 @@ const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
 const Admin = require('../../model/admin');
 const Prescription = require('../../model/prescription');
-const {
-  uploadPdfToGoogleDrive,
-  uploadImageToGoogleDrive
-} = require('../../utils/googleHelper');
+const { uploadPdfToGoogleDrive } = require('../../utils/googleHelper');
 const { renderPdf } = require('../../utils/renderFile');
 
 // Clinic meta data
@@ -110,13 +107,9 @@ exports.updateClinicMetaData = async (req, res) => {
     if (!existingMetaData) {
       throw new Error('Clinic meta data not found');
     }
-    const { bannerUrl, title, body, question, answer, schedule } = req.body;
-    if (bannerUrl) {
-      existingMetaData.bannerUrl = await uploadImageToGoogleDrive(
-        bannerUrl,
-        'banner.png'
-      );
-      // existingMetaData.bannerUrl = bannerUrl;
+    const { filename, title, body, question, answer, schedule } = req.body;
+    if (filename) {
+      existingMetaData.bannerUrl = filename;
     }
     if (title) existingMetaData.desc.title = title;
     if (body) {

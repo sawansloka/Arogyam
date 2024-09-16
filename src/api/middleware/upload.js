@@ -1,6 +1,6 @@
 const multer = require('multer');
 const { GridFsStorage } = require('multer-gridfs-storage');
-const { dbUri } = require('../../config/vars');
+const { dbUri, assetsBucket } = require('../../config/vars');
 
 function upload() {
   const storage = new GridFsStorage({
@@ -8,8 +8,8 @@ function upload() {
     file: (req, file) =>
       new Promise((resolve) => {
         const fileInfo = {
-          filename: file.originalname,
-          bucketName: 'assetsBucket'
+          filename: `${file.fieldname}.${file.mimetype.split('/')[1]}`,
+          bucketName: assetsBucket
         };
         resolve(fileInfo);
       })
