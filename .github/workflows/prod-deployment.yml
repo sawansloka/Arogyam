@@ -18,7 +18,7 @@ jobs:
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
-          token: ${{ secrets.DIGITAL_OCEAN_DEPLOYMENT_TOKEN }}
+          token: dop_v1_176762bf5f5e32437f4300301686da5be211402e48448dbba172f86e1ff72d3c
 
       - name: Create a new deployment
-        run: doctl apps create-deployment ${{ secrets.DIGITAL_OCEAN_APP_ID }}
+        run: doctl apps create-deployment 489d8068-d4ad-49ef-b6e6-4e10d1c2f0477
