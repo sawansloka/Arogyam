@@ -153,9 +153,17 @@ exports.listAvailableSlots = async (req, res) => {
       }
     });
 
+    const formattedStartTime = startTime
+      .toISOString()
+      .split('T')[1]
+      .split('.')[0];
+    const formattedEndTime = endTime.toISOString().split('T')[1].split('.')[0];
+
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       date: selectedDate.toISOString().split('T')[0],
+      startTime: formattedStartTime,
+      endTime: formattedEndTime,
       availableSlots
     });
   } catch (e) {
