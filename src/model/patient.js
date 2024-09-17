@@ -43,17 +43,33 @@ const patientSchema = new mongoose.Schema(
       type: [Date],
       default: []
     },
-    prescriptionUrl: {
-      type: String,
-      default: null
+    prescription: {
+      url: {
+        type: String,
+        default: null
+      },
+      date: {
+        type: Date,
+        default: null
+      }
     },
-    visitedPrescriptionUrls: {
-      type: [String],
-      default: []
-    }
+    visitedPrescriptionUrls: [
+      {
+        url: {
+          type: String,
+          required: true
+        },
+        date: {
+          type: Date,
+          required: true
+        }
+      }
+    ]
   },
   {
-    timestamps: true
+    timestamps: true,
+    toJSON: { getters: true },
+    toObject: { getters: true }
   }
 );
 

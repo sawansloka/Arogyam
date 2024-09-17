@@ -60,7 +60,7 @@ router.route('/cron-job').post(adminAuth, adminController.toggleCronJob);
 // prescription
 router
   .route('/prescriptions')
-  .post(adminAuth, adminController.createPrescription);
+  .post(adminAuth, adminController.createOrUpdatePrescription);
 
 router
   .route('/prescriptions/pdf')

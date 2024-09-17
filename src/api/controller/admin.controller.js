@@ -3,10 +3,9 @@ const cron = require('node-cron');
 const puppeteer = require('puppeteer');
 const ejs = require('ejs');
 const path = require('path');
-const { google } = require('googleapis');
-const stream = require('stream');
 const { adminSecretKey } = require('../../config/vars');
 const { toIST } = require('../../utils/publicHelper');
+const { uploadToGoogleDrive } = require('../../utils/adminHelper');
 
 const ClinicMetaData = require('../../model/clinicMetaData');
 const CustomerFeedback = require('../../model/customerFeedback');
@@ -14,8 +13,6 @@ const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
 const Admin = require('../../model/admin');
 const Prescription = require('../../model/prescription');
-
-const CREDENTIALS_PATH = path.join(__dirname, '../../../credentials.json');
 
 // Clinic meta data
 exports.upsertClinicMeta = async (req, res) => {
@@ -884,14 +881,11 @@ exports.forgotPassword = async (req, res) => {
 };
 
 // Patient Prescription
-exports.createPrescription = async (req, res) => {
+exports.createOrUpdatePrescription = async (req, res) => {
   try {
-    const { patientId } = req.body.patient;
+    const { patientId, weight, height } = req.body.patient;
 
     const patient = await Patient.findOne({ patientId });
-
-    req.body.patient.name = patient.name;
-    req.body.patient.phone = patient.phone;
 
     if (!patient) {
       return res.status(StatusCodes.NOT_FOUND).send({
@@ -900,8 +894,26 @@ exports.createPrescription = async (req, res) => {
       });
     }
 
-    const prescription = new Prescription(req.body);
-    await prescription.save();
+    req.body.patient.name = patient.name;
+    req.body.patient.phone = patient.phone;
+
+    if (weight && height) {
+      const heightInMeters = height / 100;
+      const bmi = (weight / (heightInMeters * heightInMeters)).toFixed(1);
+      req.body.patient.bmi = bmi;
+    } else {
+      req.body.patient.bmi = 'N/A';
+    }
+
+    const prescription = await Prescription.findOneAndUpdate(
+      { 'patient.patientId': patientId },
+      req.body,
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true
+      }
+    );
 
     return res.status(StatusCodes.CREATED).send({
       status: 'Success',
@@ -916,17 +928,64 @@ exports.createPrescription = async (req, res) => {
   }
 };
 
-exports.getAllPrescriptions = async (req, res) => {
+exports.getPatients = async (req, res) => {
   try {
-    const prescriptions =
-      await Prescription.find().populate('patientId doctorId');
+    const { patientId } = req.query;
+
+    if (patientId) {
+      const patient = await Patient.findOne({ patientId }).lean();
+
+      if (!patient) {
+        return res.status(StatusCodes.NOT_FOUND).send({
+          status: 'Error',
+          message: 'Patient not found'
+        });
+      }
+
+      const prescriptionUrls = [
+        ...(patient.prescription.url
+          ? [{ url: patient.prescription.url, date: patient.prescription.date }]
+          : []),
+        ...patient.visitedPrescriptionUrls
+      ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      const response = {
+        patientId: patient.patientId,
+        name: patient.name,
+        prescriptionUrls
+      };
+
+      return res.status(StatusCodes.OK).send({
+        status: 'Success',
+        message: 'Patient and prescriptions fetched successfully',
+        data: response
+      });
+    }
+
+    const patients = await Patient.find().sort({ createdAt: -1 }).lean();
+
+    const response = patients.map((patient) => {
+      const prescriptionUrls = [
+        ...(patient.prescription.url
+          ? [{ url: patient.prescription.url, date: patient.prescription.date }]
+          : []),
+        ...patient.visitedPrescriptionUrls
+      ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      return {
+        patientId: patient.patientId,
+        name: patient.name,
+        prescriptionUrls
+      };
+    });
 
     return res.status(StatusCodes.OK).send({
       status: 'Success',
-      message: 'Prescriptions fetched successfully',
-      data: prescriptions
+      message: 'All patients fetched successfully',
+      data: response
     });
   } catch (error) {
+    console.error('Error fetching patients:', error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
       message: error.message || 'Internal Server Error'
@@ -1011,63 +1070,9 @@ exports.deletePrescription = async (req, res) => {
   }
 };
 
-// Google Drive Setup
-async function uploadToGoogleDrive(pdfBuffer, fileName) {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: CREDENTIALS_PATH,
-    scopes: ['https://www.googleapis.com/auth/drive.file']
-  });
-
-  const drive = google.drive({ version: 'v3', auth });
-
-  const fileMetadata = {
-    name: fileName,
-    parents: ['10pBVAO7MnCdbBaTNLa8vlidqxIvwHu1U'] // Optional: Folder ID to save the file in a specific folder
-  };
-
-  // Convert the Uint8Array to a Buffer
-  const bufferStream = new stream.PassThrough();
-  bufferStream.end(pdfBuffer);
-
-  const media = {
-    mimeType: 'application/pdf',
-    body: bufferStream
-  };
-
-  try {
-    const response = await drive.files.create({
-      resource: fileMetadata,
-      media,
-      fields: 'id'
-    });
-
-    const fileId = response.data.id;
-
-    // Generate a public link
-    await drive.permissions.create({
-      fileId,
-      requestBody: {
-        role: 'reader',
-        type: 'anyone'
-      }
-    });
-
-    // Get the public URL
-    const result = await drive.files.get({
-      fileId,
-      fields: 'webViewLink, webContentLink'
-    });
-
-    return result.data.webViewLink; // Returns the link to view the file
-  } catch (error) {
-    console.error('Error uploading file to Google Drive:', error.message);
-    throw new Error('Failed to upload file to Google Drive');
-  }
-}
-
 exports.generatePrescriptionPDF = async (req, res) => {
   try {
-    const { patientId } = req.query;
+    const { patientId } = req.body;
 
     const prescription = await Prescription.findOne({
       'patient.patientId': patientId
@@ -1106,23 +1111,34 @@ exports.generatePrescriptionPDF = async (req, res) => {
 
     await browser.close();
 
-    // Upload to Google Drive and get the link
-    const pdfLink = await uploadToGoogleDrive(
-      pdfBuffer,
-      `${patient.patientId}-${patient.name}-prescription.pdf`
-    );
-    console.log(`PDF uploaded to Google Drive with link: ${pdfLink}`);
-
     const existingPatient = await Patient.findOne({
       patientId: patient.patientId
     });
 
-    if (existingPatient.prescriptionUrl) {
-      existingPatient.visitedPrescriptionUrls.push(
-        existingPatient.prescriptionUrl
-      );
+    let count = (existingPatient.visitedPrescriptionUrls.length || 0) + 1;
+    if (count === 1) {
+      if (existingPatient.prescription.url) {
+        count = 2;
+      }
     }
-    existingPatient.prescriptionUrl = pdfLink;
+
+    // Upload to Google Drive and get the link
+    const pdfLink = await uploadToGoogleDrive(
+      pdfBuffer,
+      `${patient.patientId}-${patient.name}-${count}-prescription.pdf`
+    );
+
+    if (existingPatient.prescription && existingPatient.prescription.url) {
+      existingPatient.visitedPrescriptionUrls.push({
+        url: existingPatient.prescription.url,
+        date: existingPatient.prescription.date
+      });
+    }
+
+    existingPatient.prescription = {
+      url: pdfLink,
+      date: toIST(new Date())
+    };
 
     await existingPatient.save();
 
