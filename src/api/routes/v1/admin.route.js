@@ -1,6 +1,7 @@
 const express = require('express');
 const adminController = require('../../controller/admin.controller');
 const adminAuth = require('../../middleware/adminAuth');
+const restrictToDoctor = require('../../middleware/restrictToDoctor');
 const { uploadSimple } = require('../../middleware/multer');
 
 const router = express.Router();
@@ -19,8 +20,8 @@ router.route('/jwtvalidate').post(adminController.jwtValidate);
 // Clinic meta data
 router
   .route('/clinic-meta')
-  .post(adminAuth, adminController.upsertClinicMeta)
-  .get(adminAuth, adminController.getClinicMeta);
+  .post(adminAuth, restrictToDoctor, adminController.upsertClinicMeta)
+  .get(adminAuth, restrictToDoctor, adminController.getClinicMeta);
 
 router
   .route('/clinic-meta/:metaId')
@@ -29,28 +30,30 @@ router
     uploadSimple.single('bannerUrl'),
     adminController.updateClinicMetaData
   )
-  .delete(adminAuth, adminController.deleteClinicMeta);
+  .delete(adminAuth, restrictToDoctor, adminController.deleteClinicMeta);
 
 // Customer Feedback data
-router.route('/feedbacks').get(adminAuth, adminController.listAllFeedbacks);
+router
+  .route('/feedbacks')
+  .get(adminAuth, restrictToDoctor, adminController.listAllFeedbacks);
 
 router
   .route('/feedbacks/:id')
-  .get(adminAuth, adminController.getFeedbackById)
-  .put(adminAuth, adminController.updateFeedbackById)
-  .delete(adminAuth, adminController.deleteFeedback);
+  .get(adminAuth, restrictToDoctor, adminController.getFeedbackById)
+  .put(adminAuth, restrictToDoctor, adminController.updateFeedbackById)
+  .delete(adminAuth, restrictToDoctor, adminController.deleteFeedback);
 
 // schedule slots
 router
   .route('/schedule')
-  .post(adminAuth, adminController.setSchedule)
+  .post(adminAuth, restrictToDoctor, adminController.setSchedule)
   .get(adminAuth, adminController.listSchedules);
 
 router
   .route('/schedule/:id')
-  .put(adminAuth, adminController.updateSchedule)
+  .put(adminAuth, restrictToDoctor, adminController.updateSchedule)
   .get(adminAuth, adminController.getScheduleById)
-  .delete(adminAuth, adminController.deleteSchedule);
+  .delete(adminAuth, restrictToDoctor, adminController.deleteSchedule);
 
 // appointment booking
 router.route('/appointments').get(adminAuth, adminController.listAppointments);
@@ -62,20 +65,22 @@ router
   .delete(adminAuth, adminController.deleteAppointmentById);
 
 // enable or disable schedule
-router.route('/cron-job').post(adminAuth, adminController.toggleCronJob);
+router
+  .route('/cron-job')
+  .post(adminAuth, restrictToDoctor, adminController.toggleCronJob);
 
 // prescription
 router
   .route('/prescriptions')
-  .post(adminAuth, adminController.createPrescription);
+  .post(adminAuth, restrictToDoctor, adminController.createPrescription);
 
 router
   .route('/prescriptions/:id')
-  .put(adminAuth, adminController.updatePrescription);
+  .put(adminAuth, restrictToDoctor, adminController.updatePrescription);
 
 router
   .route('/prescriptions/pdf')
-  .post(adminController.generatePrescriptionPDF);
+  .post(adminAuth, adminController.generatePrescriptionPDF);
 
 router
   .route('/get-patient-data/:id')
