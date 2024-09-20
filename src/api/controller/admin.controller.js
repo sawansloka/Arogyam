@@ -3,6 +3,7 @@ const cron = require('node-cron');
 const jwt = require('jsonwebtoken');
 const {
   adminSecretKey,
+  nonDocSecretKey,
   jwtSecretKey,
   digitalOceanService
 } = require('../../config/vars');
@@ -755,7 +756,8 @@ exports.signUp = async (req, res) => {
       });
     }
 
-    if (key.toString() !== adminSecretKey.toString()) {
+    const isDoctor = key.toString() === adminSecretKey.toString();
+    if (!isDoctor && key.toString() !== nonDocSecretKey.toString()) {
       return res.status(StatusCodes.BAD_REQUEST).send({
         status: 'Error',
         message: 'Provide valid key'
@@ -770,7 +772,7 @@ exports.signUp = async (req, res) => {
       });
     }
 
-    const admin = new Admin({ name, email, password, phone });
+    const admin = new Admin({ name, email, password, phone, isDoctor });
 
     await admin.save();
 
@@ -1038,7 +1040,7 @@ exports.deletePrescription = async (req, res) => {
 
 exports.generatePrescriptionPDF = async (req, res) => {
   try {
-    const { patientId } = req.query;
+    const { patientId } = req.body;
 
     const prescription = await Prescription.findOne({
       'patient.patientId': patientId
@@ -1061,23 +1063,35 @@ exports.generatePrescriptionPDF = async (req, res) => {
       prescription
     );
 
-    // Upload to Google Drive and get the link
-    const pdfLink = await uploadPdfToGoogleDrive(
-      pdfBuffer,
-      `${patient.patientId}-${patient.name}-prescription.pdf`
-    );
-    console.log(`PDF uploaded to Google Drive with link: ${pdfLink}`);
-
     const existingPatient = await Patient.findOne({
       patientId: patient.patientId
     });
 
-    if (existingPatient.prescriptionUrl) {
-      existingPatient.visitedPrescriptionUrls.push(
-        existingPatient.prescriptionUrl
-      );
+    let count = (existingPatient.visitedPrescriptionUrls.length || 0) + 1;
+    if (count === 1) {
+      if (existingPatient.prescription.url) {
+        count += 1;
+      }
     }
-    existingPatient.prescriptionUrl = pdfLink;
+
+    // Upload to Google Drive and get the link
+    const pdfLink = await uploadPdfToGoogleDrive(
+      pdfBuffer,
+      `${patient.patientId}-${patient.name}-${count}-prescription.pdf`
+    );
+    console.log(`PDF uploaded to Google Drive with link: ${pdfLink}`);
+
+    if (existingPatient.prescriptionUrl) {
+      existingPatient.visitedPrescriptionUrls.push({
+        url: existingPatient.prescription.url,
+        date: existingPatient.prescription.date
+      });
+    }
+
+    existingPatient.prescription = {
+      url: pdfLink,
+      date: toIST(new Date())
+    };
 
     await existingPatient.save();
 
