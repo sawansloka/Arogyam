@@ -8,6 +8,7 @@ exports.renderPdf = async (template, renderData) => {
   const browser = await puppeteer.launch({
     headless: true,
     executablePath: '/usr/bin/chromium-browser',
+    // executablePath: '/opt/homebrew/bin/chromium',
     args: [
       '--no-sandbox',
       '--headless',

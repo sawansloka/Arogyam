@@ -51,6 +51,7 @@ exports.uploadPdfToGoogleDrive = async (pdfBuffer, fileName) => {
 
     return result.data.webViewLink; // Returns the link to view the file
   } catch (error) {
+    console.error('Error details:', error.response.data);
     console.error('Error uploading file to Google Drive:', error.message);
     throw new Error('Failed to upload file to Google Drive');
   }

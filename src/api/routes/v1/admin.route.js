@@ -75,8 +75,20 @@ router
   .post(adminAuth, restrictToDoctor, adminController.createPrescription);
 
 router
+  .route('/prescriptions')
+  .get(adminAuth, adminController.getAllPrescriptions);
+
+router
   .route('/prescriptions/:id')
   .put(adminAuth, restrictToDoctor, adminController.updatePrescription);
+
+router
+  .route('/prescriptions/:id')
+  .get(adminAuth, adminController.getPrescriptionById);
+
+router
+  .route('/prescriptions/:id')
+  .delete(adminAuth, restrictToDoctor, adminController.deletePrescription);
 
 router
   .route('/prescriptions/pdf')

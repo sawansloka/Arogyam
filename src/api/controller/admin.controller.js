@@ -945,13 +945,40 @@ exports.createPrescription = async (req, res) => {
 
 exports.getAllPrescriptions = async (req, res) => {
   try {
-    const prescriptions =
-      await Prescription.find().populate('patientId doctorId');
+    const { patientId, startDate, endDate, page = 1, limit = 10 } = req.query;
+
+    // Build the query
+    const query = {};
+    if (patientId) {
+      query['patient.patientId'] = patientId;
+    }
+    if (startDate || endDate) {
+      query.followUpDate = {};
+      if (startDate) {
+        query.followUpDate.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        query.followUpDate.$lte = new Date(endDate);
+      }
+    }
+
+    const prescriptions = await Prescription.find(query)
+      .populate('patient.patientId')
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit, 10));
+
+    const totalCount = await Prescription.countDocuments(query);
 
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       message: 'Prescriptions fetched successfully',
-      data: prescriptions
+      data: prescriptions,
+      pagination: {
+        totalCount,
+        currentPage: parseInt(page, 10),
+        totalPages: Math.ceil(totalCount / limit),
+        limit: parseInt(limit, 10)
+      }
     });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
@@ -1067,12 +1094,10 @@ exports.generatePrescriptionPDF = async (req, res) => {
       patientId: patient.patientId
     });
 
-    let count = (existingPatient.visitedPrescriptionUrls.length || 0) + 1;
-    if (count === 1) {
-      if (existingPatient.prescription.url) {
-        count += 1;
-      }
-    }
+    let count = existingPatient.visitedPrescriptionUrls
+      ? existingPatient.visitedPrescriptionUrls.length + 1
+      : 1;
+    count = existingPatient.prescription.url ? (count += 1) : 1;
 
     // Upload to Google Drive and get the link
     const pdfLink = await uploadPdfToGoogleDrive(
@@ -1081,7 +1106,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
     );
     console.log(`PDF uploaded to Google Drive with link: ${pdfLink}`);
 
-    if (existingPatient.prescriptionUrl) {
+    if (existingPatient.prescription.url) {
       existingPatient.visitedPrescriptionUrls.push({
         url: existingPatient.prescription.url,
         date: existingPatient.prescription.date
