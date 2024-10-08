@@ -6,7 +6,10 @@ const CustomerFeedbackSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please provide your name']
     },
-    imageUrl: {
+    beforeImage: {
+      type: String
+    },
+    afterImage: {
       type: String
     },
     desc: {
