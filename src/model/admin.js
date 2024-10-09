@@ -34,6 +34,10 @@ const adminSchema = new mongoose.Schema(
       minLength: 10,
       maxLength: 10
     },
+    isDoctor: {
+      type: Boolean,
+      default: true
+    },
     tokens: [
       {
         token: {

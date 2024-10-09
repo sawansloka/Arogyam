@@ -1,11 +1,17 @@
 const { StatusCodes } = require('http-status-codes');
-const { toIST, checkSlotAvailibility } = require('../../utils/publicHelper');
-
+const { v4: uuidv4 } = require('uuid');
+const {
+  toIST,
+  checkSlotAvailibility,
+  converBase64ToBuffer
+} = require('../../utils/publicHelper');
 const ClinicMetaData = require('../../model/clinicMetaData');
 const CustomerFeedback = require('../../model/customerFeedback');
 const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
 const { getImage } = require('../../utils/gridFsHelper');
+const { uploadToS3 } = require('../../utils/s3');
+const { digitalOceanService } = require('../../config/vars');
 
 // Clinic Home Data
 exports.getClinicMeta = async (req, res) => {
@@ -48,14 +54,29 @@ exports.getClinicMetaBanner = async (req, res) => {
 // customer data
 exports.createFeedback = async (req, res) => {
   try {
-    const { name, imageUrl, desc, videoUrls } = req.body;
+    const { name, beforeImage, afterImage, desc, videoUrls } = req.body;
 
     const feedback = new CustomerFeedback({
       name,
-      imageUrl,
       desc,
       videoUrls
     });
+
+    const filenameSuffix = uuidv4();
+    if (beforeImage) {
+      await uploadToS3(
+        converBase64ToBuffer(beforeImage),
+        `before_image-${filenameSuffix}`
+      );
+      feedback.beforeImage = `${digitalOceanService.originUrl}/before_image-${filenameSuffix}`;
+    }
+    if (afterImage) {
+      await uploadToS3(
+        converBase64ToBuffer(afterImage),
+        `after_image-${filenameSuffix}`
+      );
+      feedback.afterImage = `${digitalOceanService.originUrl}/after_image-${filenameSuffix}`;
+    }
 
     await feedback.save();
 
@@ -153,9 +174,17 @@ exports.listAvailableSlots = async (req, res) => {
       }
     });
 
+    const formattedStartTime = startTime
+      .toISOString()
+      .split('T')[1]
+      .split('.')[0];
+    const formattedEndTime = endTime.toISOString().split('T')[1].split('.')[0];
+
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       date: selectedDate.toISOString().split('T')[0],
+      startTime: formattedStartTime,
+      endTime: formattedEndTime,
       availableSlots
     });
   } catch (e) {

@@ -18,3 +18,8 @@ exports.checkSlotAvailibility = async (startOfHour, endOfHour, slot) => {
 
   return { isAvailable, formattedTime };
 };
+
+exports.converBase64ToBuffer = (base64) => {
+  const base64Data = base64.replace(/^data:image\/\w+;base64,/, '');
+  return Buffer.from(base64Data, 'base64');
+};

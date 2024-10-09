@@ -98,15 +98,31 @@
     }
 
     .medicine-heading {
-      width: 40%;
+      width: 20%;
+    }
+
+    .potency-heading {
+      width: 15%;
     }
 
     .dosage-heading {
-      width: 30%;
+      width: 15%;
     }
 
-    .duration-heading {
-      width: 30%;
+    .repetition-heading {
+      width: 10%;
+    }
+
+    .qty-heading {
+      width: 10%;
+    }
+
+    .period-heading {
+      width: 15%;
+    }
+
+    .remarks-heading {
+      width: 15%;
     }
 
     .medications-item {
@@ -117,16 +133,33 @@
     }
 
     .medicine-name {
-      width: 40%;
+      width: 20%;
+    }
+
+    .potency {
+      width: 15%;
     }
 
     .dosage {
-      width: 30%;
+      width: 15%;
     }
 
-    .duration {
-      width: 30%;
+    .repetition {
+      width: 10%;
     }
+
+    .qty {
+      width: 10%;
+    }
+
+    .period {
+      width: 15%;
+    }
+
+    .remarks {
+      width: 15%;
+    }
+
   </style>
 </head>
 
@@ -159,9 +192,9 @@
   <hr />
   <div class="patient-info">
     <div>
-      <div><b>ID: <%= patient.patientId %> / <%= patient.name %> (<%= patient.gender %>) / <%= patient.age %> Y &nbsp;&nbsp;&nbsp;&nbsp;</b></div>
-      <div><b>Mob. No.: <%= patient.phone %></b></div>
-      <div>Address: <%= patient.address %></div>
+      <div style="margin-bottom: 4px;"><b>ID: <%= patient.patientId %> / <%= patient.name %> (<%= patient.gender %>) / <%= patient.age %> Y &nbsp;&nbsp;&nbsp;&nbsp;</b></div>
+      <div style="margin-bottom: 4px;"><b>Mob. No.: <%= patient.phone %></b></div>
+      <div style="margin-bottom: 4px;">Address: <%= patient.address %></div>
       <div>Weight (kg): <%= patient.weight || 'N/A' %>, Height (cm): <%= patient.height || 'N/A' %> (B.M.I. = <%= patient.bmi %>), BP: <%= patient.bp || 'N/A' %> mmHg</div>
     </div>
     <div><b>Date: <%= new Date().toLocaleDateString() %></b></div>
@@ -174,12 +207,12 @@
     <div class="findings-data">
       <ul class="chief-complaints">
         <% for (let i = 0; i < complaints.length; i++) { %>
-            <li><%= complaints[i] %></li>
+            <li style="width: 50%;"><%= complaints[i] %></li>
         <% } %>
       </ul>
       <ul class="clinical-findings">
         <% for (let i = 0; i < findings.length; i++) { %>
-            <li><%= findings[i] %></li>
+            <li style="width: 50%;"><%= findings[i] %></li>
         <% } %>
       </ul>
     </div>
@@ -194,25 +227,27 @@
   </div>
   <div class="medications">
     <div class="medications-heading">
-      <div class="medicine-heading">Medicine Name</div>
+      <div class="medicine-heading">Drug Name</div>
+      <div class="potency-heading">Potency</div>
       <div class="dosage-heading">Dosage</div>
-      <div class="duration-heading">Duration</div>
+      <div class="repetition-heading">Repetition</div>
+      <div class="qty-heading">Qty</div>
+      <div class="period-heading">Period</div>
+      <div class="remarks-heading">Remarks</div>
     </div>
-
+  
     <% for (let i = 0; i < prescriptionItems.length; i++) { %>
-        <div class="medications-item">
-            <div class="medicine-name"><%= i + 1 %>. <%= prescriptionItems[i].drugName %> <%= prescriptionItems[i].potency %></div>
-            <div class="dosage">
-                <div><%= prescriptionItems[i].dosage %>&nbsp;<%= prescriptionItems[i].repetition %></div>
-                <div><%= prescriptionItems[i].remarks %></div>
-            </div>
-            <div class="duration">
-                <div><%= prescriptionItems[i].period %></div>
-                <div>(Total:<%= prescriptionItems[i].qty %>)</div>
-            </div>
-        </div>
+      <div class="medications-item">
+        <div class="medicine-name"><%= prescriptionItems[i].drugName %></div>
+        <div class="potency"><%= prescriptionItems[i].potency %></div>
+        <div class="dosage"><%= prescriptionItems[i].dosage %></div>
+        <div class="repetition"><%= prescriptionItems[i].repetition %></div>
+        <div class="qty"><%= prescriptionItems[i].qty %></div>
+        <div class="period"><%= prescriptionItems[i].period %></div>
+        <div class="remarks"><%= prescriptionItems[i].remarks %></div>
+      </div>
     <% } %>
-  </div>
+  </div>  
   <div class="advice">
     <div class="advice-heading"><b>Advice:</b></div>
     <ul>
