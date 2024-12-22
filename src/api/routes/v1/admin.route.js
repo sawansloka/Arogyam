@@ -98,4 +98,17 @@ router
   .route('/get-patient-data/:id')
   .get(adminAuth, adminController.getPatientData);
 
+// diagnosis
+router
+  .route('/diagnosis-json')
+  .get(adminAuth, restrictToDoctor, adminController.getArogyamDiagnosis);
+
+router
+  .route('/diagnosis')
+  .post(adminAuth, restrictToDoctor, adminController.createDiagnosis);
+
+router
+  .route('/diagnosis/:id')
+  .get(adminAuth, restrictToDoctor, adminController.getDiagnosis);
+
 module.exports = router;
