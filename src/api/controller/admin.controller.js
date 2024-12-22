@@ -17,8 +17,6 @@ const Prescription = require('../../model/prescription');
 const { uploadPdfToGoogleDrive } = require('../../utils/googleHelper');
 const { renderPdf } = require('../../utils/renderFile');
 const { uploadToS3 } = require('../../utils/s3');
-const ArogyamDiagnosis = require('../../utils/arogyamDiagnosis.json');
-const Diagnosis = require('../../model/diagnosis');
 
 // Clinic meta data
 exports.upsertClinicMeta = async (req, res) => {
@@ -919,15 +917,15 @@ exports.createPrescription = async (req, res) => {
 
     const patient = await Patient.findOne({ patientId });
 
+    req.body.patient.name = patient.name;
+    req.body.patient.phone = patient.phone;
+
     if (!patient) {
       return res.status(StatusCodes.NOT_FOUND).send({
         status: 'Error',
         message: 'Patient not found'
       });
     }
-
-    req.body.patient.name = patient.name;
-    req.body.patient.phone = patient.phone;
 
     const prescription = new Prescription(req.body);
     await prescription.save();
@@ -1086,25 +1084,15 @@ exports.generatePrescriptionPDF = async (req, res) => {
     prescription.complaints = prescription.complaints || [];
     prescription.findings = prescription.findings || [];
 
-    const existingPatient = await Patient.findOne({
-      patientId: patient.patientId
-    });
-
-    if (
-      existingPatient.prescription.url &&
-      existingPatient.prescription.date.startsWith(toIST(new Date()))
-    ) {
-      return res.status(StatusCodes.BAD_REQUEST).send({
-        status: 'Error',
-        message: 'Prescription for the current date has already been generated.'
-      });
-    }
-
     // Generate PDF buffer
     const pdfBuffer = await renderPdf(
       'src/views/prescription.ejs',
       prescription
     );
+
+    const existingPatient = await Patient.findOne({
+      patientId: patient.patientId
+    });
 
     let count = existingPatient.visitedPrescriptionUrls
       ? existingPatient.visitedPrescriptionUrls.length + 1
@@ -1114,7 +1102,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
     // Upload to Google Drive and get the link
     const pdfLink = await uploadPdfToGoogleDrive(
       pdfBuffer,
-      `${patient.patientId}-${patient.name}-${count}-${toIST(new Date())}-prescription.pdf`
+      `${patient.patientId}-${patient.name}-${count}-prescription.pdf`
     );
     console.log(`PDF uploaded to Google Drive with link: ${pdfLink}`);
 
@@ -1173,84 +1161,6 @@ exports.getPatientData = async (req, res) => {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
       message: err.message || 'Internal Server Error'
-    });
-  }
-};
-
-// Diagnosis
-exports.getArogyamDiagnosis = async (req, res) => {
-  try {
-    const arogyamDiagnosis = ArogyamDiagnosis;
-
-    if (!arogyamDiagnosis) {
-      return res.status(StatusCodes.NOT_FOUND).send({
-        status: 'Not found',
-        error: 'Arogyam diagnosis data not found'
-      });
-    }
-
-    return res.status(StatusCodes.OK).send({
-      status: 'Success',
-      data: arogyamDiagnosis
-    });
-  } catch (e) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-      status: 'Fetch failed',
-      error: e.message || e
-    });
-  }
-};
-
-exports.createDiagnosis = async (req, res) => {
-  try {
-    const { patientId, sections } = req.body;
-
-    const patient = await Patient.findOne({ patientId });
-
-    if (!patient) {
-      return res.status(StatusCodes.NOT_FOUND).send({
-        status: 'Error',
-        message: 'Patient not found'
-      });
-    }
-
-    const diagnosis = new Diagnosis({ patientId, sections });
-    await diagnosis.save();
-
-    return res.status(StatusCodes.CREATED).send({
-      status: 'Success',
-      message: 'Diagnosis data created successfully',
-      data: diagnosis
-    });
-  } catch (e) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-      status: 'Creation failed',
-      error: e.message || e
-    });
-  }
-};
-
-exports.getDiagnosis = async (req, res) => {
-  try {
-    const patientId = req.params.id;
-
-    const diagnosis = await Diagnosis.findOne({ patientId });
-
-    if (!diagnosis) {
-      return res.status(404).send({
-        status: 'Error',
-        message: `No diagnosis found for patientId: ${patientId}`
-      });
-    }
-
-    return res.status(200).send({
-      status: 'Success',
-      data: diagnosis
-    });
-  } catch (error) {
-    return res.status(500).send({
-      status: 'Error',
-      message: error.message || 'Failed to fetch diagnosis.'
     });
   }
 };
