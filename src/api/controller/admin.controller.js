@@ -342,6 +342,34 @@ const scheduleCronJob = async () => {
         console.log('No schedules found that are older than 15 days.');
       }
 
+      // Find patients with status 'BOOKED' for previous dates
+      const outdatedPatients = await Patient.find({
+        status: 'BOOKED',
+        appointmentTime: { $lt: today }
+      });
+
+      if (outdatedPatients.length > 0) {
+        const patientIds = outdatedPatients.map((patient) => patient._id);
+        console.log(
+          `Cron job found ${outdatedPatients.length} outdated patients with status 'BOOKED'. Patient IDs:`,
+          patientIds
+        );
+
+        // Update their status to 'CANCELLED'
+        await Patient.updateMany(
+          {
+            _id: { $in: patientIds }
+          },
+          { $set: { status: 'CANCELLED' } }
+        );
+
+        console.log(
+          `Cron job updated the status of ${outdatedPatients.length} patients to 'CANCELLED'.`
+        );
+      } else {
+        console.log('No outdated patients found with status "BOOKED".');
+      }
+
       // Calculate the date for the 7th day from today
       const futureDate = new Date(today.setDate(today.getDate() + 7));
       futureDate.setUTCHours(0, 0, 0, 0);
