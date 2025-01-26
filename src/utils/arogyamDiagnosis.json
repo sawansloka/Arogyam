@@ -157,7 +157,7 @@
         {
           "id": "q202",
           "question": "Segment",
-          "type": "select",
+          "type": "segmented_select",
           "options": [
             "ALLERGY",
             "ANO RECTAL DISORDER",
@@ -192,467 +192,460 @@
             "URINARY",
             "WEIGHT MANAGEMENT",
             "WOMENS HEALTH"
-          ]
-        },
-        {
-          "id": "q203",
-          "question": "Sub-Segment",
-          "type": "select",
-          "options": {
-            "ALLERGY": [
-              "ALLERGIC RHINITIS",
-              "ASTHMA",
-              "GLUTEN INTOLERANCE",
-              "LACTOSE INTOLERANCE",
-              "PROTEIN ALLERGY"
+          ],
+          "sub_segment": {
+            "question": "Sub-Segment",
+            "options": {
+              "ALLERGY": [
+                "ALLERGIC RHINITIS",
+                "ASTHMA",
+                "GLUTEN INTOLERANCE",
+                "LACTOSE INTOLERANCE",
+                "PROTEIN ALLERGY"
             ],
             "ANO RECTAL DISORDER": [
-              "PILES/FISSURE/FISTULA"
-            ],
-            "ANO RECTAL DISORDER": [
-              "PILES/FISSURE/FISTULA"
+                "PILES/FISSURE/FISTULA"
             ],
             "CANCER/MALIGNANCY": [],
             "CARDIOVASCULAR": [
-              "HYPERLIPIDEMIA",
-              "HYPERTENSION",
-              "ISCHAEMIC HEART DISEASE/LEFT VENTRICULAR FAILURE",
-              "PULMONARY HYPERTENSION",
-              "RESTRICTIVE CARDIOMYOPATHY",
-              "RHEUMATIC HEART DISEASE"
+                "HYPERLIPIDEMIA",
+                "HYPERTENSION",
+                "ISCHAEMIC HEART DISEASE/LEFT VENTRICULAR FAILURE",
+                "PULMONARY HYPERTENSION",
+                "RESTRICTIVE CARDIOMYOPATHY",
+                "RHEUMATIC HEART DISEASE"
             ],
             "CHILDREN DISORDERS": [
-              "ATTENTION DEFICIT DISORDER",
-              "AUTISM",
-              "BED WETTING",
-              "CONGENITAL/NEUROLOGICAL PROBLEMS",
-              "GASTROINTESTINAL DISORDER",
-              "GROWTH",
-              "G.MEMORY",
-              "H.POOR APPETITE",
-              "I.POOR IMMUNITY"
+                "ATTENTION DEFICIT DISORDER",
+                "AUTISM",
+                "BED WETTING",
+                "CONGENITAL/NEUROLOGICAL PROBLEMS",
+                "GASTROINTESTINAL DISORDER",
+                "GROWTH",
+                "G.MEMORY",
+                "H.POOR APPETITE",
+                "I.POOR IMMUNITY"
             ],
             "CIRCULATORY DISORDERS": [
-              "DVS",
-              "HAEMANGIOMA",
-              "VARICOSE VEINS"
+                "DVS",
+                "HAEMANGIOMA",
+                "VARICOSE VEINS"
             ],
             "CENTRAL NERVOUS SYSTEM": [
-              "CEREBRAL PALSY",
-              "EPILEPSY",
-              "VERTIGO"
+                "CEREBRAL PALSY",
+                "EPILEPSY",
+                "VERTIGO"
             ],
             "DE ADDICTION": [
-              "ALCOHOLISM",
-              "DIGITAL ADDICTION",
-              "SUBSTANCE ADDICTION"
+                "ALCOHOLISM",
+                "DIGITAL ADDICTION",
+                "SUBSTANCE ADDICTION"
             ],
             "DENTITION": [
-              "CARIES"
+                "CARIES"
             ],
             "ENDOCRINE": [
-              "THYROID DISORDERS",
-              "DIABETES MELLITUS",
-              "DIABETES INSIPIDUS"
+                "THYROID DISORDERS",
+                "DIABETES MELLITUS",
+                "DIABETES INSIPIDUS"
             ],
             "ENT": [
-              "OTITIS MEDIA",
-              "TINNITUS"
+                "OTITIS MEDIA",
+                "TINNITUS"
             ],
             "GASTROINTESTINAL": [
-              "ACID REFLUX",
-              "BUDD CHIARI SYNDROME",
-              "CHRONIC AMOEBIASIS",
-              "CIRRHOSIS OF LIVER",
-              "CONSTIPATION",
-              "CROHN'S DISEASE",
-              "CRYPTOGENIC LIVER DISEASE",
-              "DIARRHOEA",
-              "DUODENITIS",
-              "DYSPEPSIA/INDIGESTION",
-              "GALL BLADDER DISEASE",
-              "GASTRITIS",
-              "HEART BURN",
-              "HIATUS HERNIA",
-              "INFLAMMATORY BOWEL DISEASE",
-              "NON ULCER DYSPEPSIA",
-              "PEPTIC ULCERS",
-              "RECURRENT APTHAE",
-              "ULCERATIVE COLITIS"
+                "ACID REFLUX",
+                "BUDD CHIARI SYNDROME",
+                "CHRONIC AMOEBIASIS",
+                "CIRRHOSIS OF LIVER",
+                "CONSTIPATION",
+                "CROHN'S DISEASE",
+                "CRYPTOGENIC LIVER DISEASE",
+                "DIARRHOEA",
+                "DUODENITIS",
+                "DYSPEPSIA/INDIGESTION",
+                "GALL BLADDER DISEASE",
+                "GASTRITIS",
+                "HEART BURN",
+                "HIATUS HERNIA",
+                "INFLAMMATORY BOWEL DISEASE",
+                "NON ULCER DYSPEPSIA",
+                "PEPTIC ULCERS",
+                "RECURRENT APTHAE",
+                "ULCERATIVE COLITIS"
             ],
             "HAEMATOLOGICAL": [
-              "APLASTIC ANAEMIA",
-              "CHRONIC MYELOID LEUKAEMIA",
-              "NON-HODGKINS LYMPHOMA",
-              "THALASSAEMIA",
-              "VON WILLEBRAND'S DISEASE"
+                "APLASTIC ANAEMIA",
+                "CHRONIC MYELOID LEUKAEMIA",
+                "NON-HODGKINS LYMPHOMA",
+                "THALASSAEMIA",
+                "VON WILLEBRAND'S DISEASE"
             ],
             "HAIR": [
-              "AGA FEMALE",
-              "AGA MALE",
-              "CANITIES",
-              "NITS/PEDICULOSIS CAPITIS",
-              "PATCHY HAIR LOSS",
-              "TELOGEN EFFLUVIUM",
-              "TRICHOTILLOMANIA",
-              "WOOLY HAIR SYNDROME"
+                "AGA FEMALE",
+                "AGA MALE",
+                "CANITIES",
+                "NITS/PEDICULOSIS CAPITIS",
+                "PATCHY HAIR LOSS",
+                "TELOGEN EFFLUVIUM",
+                "TRICHOTILLOMANIA",
+                "WOOLY HAIR SYNDROME"
             ],
             "MIND": [],
             "MUSCULOSKELETAL SYSTEM": [
-              "ANKYLOSING SPONDYLITIS",
-              "ARTHRITIS",
-              "BACKACHE",
-              "GANGLION",
-              "GOUT",
-              "LUMBAGO",
-              "MIXED CONNECTIVE TISSUE DISEASE",
-              "MULTIPLE SCLEROSIS",
-              "MUSCULAR DYSTROPHY OR MYOPATHY",
-              "PROLAPSED INTERVERTEBRAL DISC (PID)",
-              "RHEUMATOID ARTHRITIS",
-              "STILLS DISEASE",
-              "SYSTEMIC LUPUS ERYTHEMATOSUS"
+                "ANKYLOSING SPONDYLITIS",
+                "ARTHRITIS",
+                "BACKACHE",
+                "GANGLION",
+                "GOUT",
+                "LUMBAGO",
+                "MIXED CONNECTIVE TISSUE DISEASE",
+                "MULTIPLE SCLEROSIS",
+                "MUSCULAR DYSTROPHY OR MYOPATHY",
+                "PROLAPSED INTERVERTEBRAL DISC (PID)",
+                "RHEUMATOID ARTHRITIS",
+                "STILLS DISEASE",
+                "SYSTEMIC LUPUS ERYTHEMATOSUS"
             ],
             "NEUROLOGICAL": [
-              "ALZHEIMERS",
-              "ATAXIA",
-              "CEREBRAL SPACE OCCUPYING LESION",
-              "CERVICAL SPONDYLITIS",
-              "EPILEPSY",
-              "GUILLAIN BARRE SYNDROME",
-              "PARKINSONS DISEASE",
-              "PETIT MAL EPILEPSY",
-              "SPASTIC CEREBRAL PALSY",
-              "TRIGEMINAL NEURALGIA"
+                "ALZHEIMERS",
+                "ATAXIA",
+                "CEREBRAL SPACE OCCUPYING LESION",
+                "CERVICAL SPONDYLITIS",
+                "EPILEPSY",
+                "GUILLAIN BARRE SYNDROME",
+                "PARKINSONS DISEASE",
+                "PETIT MAL EPILEPSY",
+                "SPASTIC CEREBRAL PALSY",
+                "TRIGEMINAL NEURALGIA"
             ],
             "OPHTHALMOLOGICAL DISORDER": [
-              "MYOPIA",
-              "HYPEROPIA"
+                "MYOPIA",
+                "HYPEROPIA"
             ],
             "PAIN MANAGEMENT": [
-              "ACHILLES TENDINITIS PAIN (ANKLE PAIN)",
-              "ANKYLOSING SPONDYLOSIS PAIN",
-              "APPENDICITIS PAIN",
-              "BLEPHARITIS PAIN",
-              "CARPAL TUNNEL SYNDROME PAIN",
-              "CERVICAL SPONDYLOSIS PAIN",
-              "CLUSTER HEADACHE PAIN",
-              "CONJUNCTIVITIS PAIN",
-              "DENTAL PAIN",
-              "ENCEPHALITIS PAIN",
-              "FACIAL NEURALGIA PAIN",
-              "FIBROMYALGIA PAIN",
-              "FROZEN SHOULDER PAIN",
-              "GALL BLADDER COLIC PAIN",
-              "GASTRITIS PAIN",
-              "GOUT PAIN",
-              "GROWING PAIN (PAIN IN LEGS/KNEE IN KIDS)",
-              "HAIRLINE FRACTURE PAIN",
-              "HIP PAIN/SACROILITIS PAIN (SERONEGATIVE SPONDYLOARTHROPATHY)",
-              "IRITIS PAIN",
-              "JUVENILE RA PAIN",
-              "LABYRINTHITIS PAIN",
-              "LUMBAR PROLAPSE DISC PAIN (SCIATICA)",
-              "LUMBAR SPONDYLOSIS PAIN",
-              "MASTOIDITIS PAIN",
-              "MENINGITIS PAIN",
-              "MIGRAINE PAIN",
-              "NEURALGIA PAIN",
-              "OPTIC NEURITIS PAIN",
-              "OSTEOMALACIA PAIN",
-              "OSTEOMYELITIS PAIN",
-              "OTITIS MEDIA PAIN",
-              "PERIPHERAL NEURITIS PAIN",
-              "PHANTOM PAIN (POST AMPUTATION)",
-              "PLANTAR FASCIITIS (PAIN IN HEELS)",
-              "POST RADIATION PAIN",
-              "POST SURGICAL PAIN",
-              "POST TRAUMATIC PAIN",
-              "RENAL COLIC PAIN",
-              "RHEUMATOID ARTHRITIS PAIN",
-              "RIB PAIN (COSTOCHONDRITIS)",
-              "SCALP FOLLICULITIS PAIN",
-              "SINUSITIS PAIN",
-              "SPRAIN PAIN",
-              "STYE PAIN",
-              "TENNIS ELBOW PAIN",
-              "TENSION HEADACHE PAIN",
-              "TMJ SYNDROME PAIN",
-              "TRAPEZITIS PAIN",
-              "TRIGEMINAL NEURALGIA PAIN",
-              "UVITIS PAIN"
+                "ACHILLES TENDINITIS PAIN (ANKLE PAIN)",
+                "ANKYLOSING SPONDYLOSIS PAIN",
+                "APPENDICITIS PAIN",
+                "BLEPHARITIS PAIN",
+                "CARPAL TUNNEL SYNDROME PAIN",
+                "CERVICAL SPONDYLOSIS PAIN",
+                "CLUSTER HEADACHE PAIN",
+                "CONJUNCTIVITIS PAIN",
+                "DENTAL PAIN",
+                "ENCEPHALITIS PAIN",
+                "FACIAL NEURALGIA PAIN",
+                "FIBROMYALGIA PAIN",
+                "FROZEN SHOULDER PAIN",
+                "GALL BLADDER COLIC PAIN",
+                "GASTRITIS PAIN",
+                "GOUT PAIN",
+                "GROWING PAIN (PAIN IN LEGS/KNEE IN KIDS)",
+                "HAIRLINE FRACTURE PAIN",
+                "HIP PAIN/SACROILITIS PAIN (SERONEGATIVE SPONDYLOARTHROPATHY)",
+                "IRITIS PAIN",
+                "JUVENILE RA PAIN",
+                "LABYRINTHITIS PAIN",
+                "LUMBAR PROLAPSE DISC PAIN (SCIATICA)",
+                "LUMBAR SPONDYLOSIS PAIN",
+                "MASTOIDITIS PAIN",
+                "MENINGITIS PAIN",
+                "MIGRAINE PAIN",
+                "NEURALGIA PAIN",
+                "OPTIC NEURITIS PAIN",
+                "OSTEOMALACIA PAIN",
+                "OSTEOMYELITIS PAIN",
+                "OTITIS MEDIA PAIN",
+                "PERIPHERAL NEURITIS PAIN",
+                "PHANTOM PAIN (POST AMPUTATION)",
+                "PLANTAR FASCIITIS (PAIN IN HEELS)",
+                "POST RADIATION PAIN",
+                "POST SURGICAL PAIN",
+                "POST TRAUMATIC PAIN",
+                "RENAL COLIC PAIN",
+                "RHEUMATOID ARTHRITIS PAIN",
+                "RIB PAIN (COSTOCHONDRITIS)",
+                "SCALP FOLLICULITIS PAIN",
+                "SINUSITIS PAIN",
+                "SPRAIN PAIN",
+                "STYE PAIN",
+                "TENNIS ELBOW PAIN",
+                "TENSION HEADACHE PAIN",
+                "TMJ SYNDROME PAIN",
+                "TRAPEZITIS PAIN",
+                "TRIGEMINAL NEURALGIA PAIN",
+                "UVITIS PAIN"
             ],
             "PSYCHIATRIC": [
-              "ANXIETY NEUROSIS",
-              "CONVERSION REACTION",
-              "MENTAL RETARDATION",
-              "PANIC DISORDER",
-              "SCHIZOPHRENIA"
+                "ANXIETY NEUROSIS",
+                "CONVERSION REACTION",
+                "MENTAL RETARDATION",
+                "PANIC DISORDER",
+                "SCHIZOPHRENIA"
             ],
             "RENAL": [
-              "ACUTE RENAL FAILURE",
-              "CHRONIC CYSTITIS",
-              "CHRONIC RENAL FAILURE",
-              "GLOMERULAR NEPHRITIS",
-              "NEPHRITIC SYNDROME",
-              "POLYCYSTIC RENAL DISEASE",
-              "RENAL CALCULUS",
-              "RENAL STONES",
-              "URINARY TRACT INFECTION"
+                "ACUTE RENAL FAILURE",
+                "CHRONIC CYSTITIS",
+                "CHRONIC RENAL FAILURE",
+                "GLOMERULAR NEPHRITIS",
+                "NEPHRITIC SYNDROME",
+                "POLYCYSTIC RENAL DISEASE",
+                "RENAL CALCULUS",
+                "RENAL STONES",
+                "URINARY TRACT INFECTION"
             ],
             "RESPIRATORY": [
-              "ALLERGIC BRONCHITIS",
-              "ASPERGILLOSIS",
-              "CHRONIC BRONCHIECTASIS",
-              "CHRONIC LARYNGITIS",
-              "COPD",
-              "CYSTIC FIBROSIS",
-              "INTERSTITIAL LUNG DISEASE",
-              "PULMONARY KOCHS",
-              "RECURRENT PHARYNGITIS",
-              "SARCOIDOSIS",
-              "SINUSITIS",
-              "SLEEP APNOEA",
-              "TONSILLITIS",
-              "WEGENER'S GRANULOMATOSIS PROTOCOL"
+                "ALLERGIC BRONCHITIS",
+                "ASPERGILLOSIS",
+                "CHRONIC BRONCHIECTASIS",
+                "CHRONIC LARYNGITIS",
+                "COPD",
+                "CYSTIC FIBROSIS",
+                "INTERSTITIAL LUNG DISEASE",
+                "PULMONARY KOCHS",
+                "RECURRENT PHARYNGITIS",
+                "SARCOIDOSIS",
+                "SINUSITIS",
+                "SLEEP APNOEA",
+                "TONSILLITIS",
+                "WEGENER'S GRANULOMATOSIS PROTOCOL"
             ],
             "RHEUMATOLOGY": [
-              "JUVENILE RHEUMATIC ARTHRITIS",
-              "RHEUMATIC FEVER"
+                "JUVENILE RHEUMATIC ARTHRITIS",
+                "RHEUMATIC FEVER"
             ],
             "SEXUAL_HEALTH": [
-              "ERECTILE DYSFUNCTION",
-              "FEMALE SEXUAL HEALTH",
-              "GENITAL WARTS",
-              "GENITAL HERPES",
-              "MALE INFERTILITY",
-              "PREMATURE EJACULATION",
-              "SYPHILIS",
-              "VARICOCELE"
+                "ERECTILE DYSFUNCTION",
+                "FEMALE SEXUAL HEALTH",
+                "GENITAL WARTS",
+                "GENITAL HERPES",
+                "MALE INFERTILITY",
+                "PREMATURE EJACULATION",
+                "SYPHILIS",
+                "VARICOCELE"
             ],
             "SKIN": [
-              "ACNE",
-              "ACNE ROSACEA",
-              "ACROCHORDONS",
-              "ACROKERATOSIS VERRUCIFORMIS",
-              "ACROPIGMENTATION",
-              "AMYLOIDOSIS",
-              "ASHY DERMATOSIS",
-              "ATOPIC DERMATITIS",
-              "BROMHIDROSIS",
-              "BULLOUS PEMPHIGOID",
-              "CARBUNCLE",
-              "CHALAZION",
-              "CHICKENPOX",
-              "CHILBLAINS",
-              "CORNS",
-              "CUTANEOUS CANDIDIASIS",
-              "DANDRUFF",
-              "DARIER'S DISEASE",
-              "DERMATITIS HERPETIFORMIS",
-              "EPIDERMOLYSIS BULLOSA",
-              "FOLLICULITIS DECALVANS",
-              "FRECKLES",
-              "FUNGAL",
-              "HANSENS",
-              "HENOCH-SCHÖNLEIN PURPURA",
-              "HERPES SIMPLEX",
-              "HERPES ZOSTER",
-              "HIDRADENITIS SUPPURATIVA",
-              "HYPERHIDROSIS",
-              "HYPERPIGMENTATION",
-              "ICHTHYOSIS",
-              "IDIOPATHIC GUTTATE HYPOMELANOSIS",
-              "KELOIDS",
-              "KERATODERMA",
-              "KERATOSIS PILARIS",
-              "LENTIGENES",
-              "LEPROSY ULCER",
-              "LICHEN PLANUS",
-              "LICHEN STRIATUS",
-              "LIPOID PROTEINOSIS",
-              "LUPOMA",
-              "LUPUS",
-              "MACULAR AMYLOIDOSIS",
-              "MELASMA",
-              "MOLES",
-              "MOLLUSCUM CONTAGIOSUM",
-              "MORPHEA",
-              "NEUROFIBROMATOSIS",
-              "NEVUS",
-              "ONYCHOMYCOSIS",
-              "PAPULAR SARCOIDOSIS",
-              "PEMPHIGUS",
-              "PHRYNODERMA",
-              "PITYRIASIS ALBA",
-              "PITYRIASIS VERSICOLOR",
-              "PLANTAR WARTS",
-              "PLEVA",
-              "POLYMORPHOUS LIGHT ERUPTION",
-              "POMPHOLYX",
-              "PROKERATOSIS",
-              "PRURIGO NODULARIS",
-              "PSORIASIS",
-              "SCABIES",
-              "SCHAMBERG'S PURPURA",
-              "SCLERODERMA",
-              "SEBACEOUS CYST",
-              "SEBORRHEIC DERMATITIS",
-              "SUBCORNEAL PUSTULAR DERMATOSIS",
-              "TINEA",
-              "TUBEROSCLEROSIS",
-              "URTICARIA",
-              "VASCULITIS",
-              "VITILIGO",
-              "WARTS",
-              "XANTHELASMA",
-              "XERODERMA PIGMENTOSUM"
+                "ACNE",
+                "ACNE ROSACEA",
+                "ACROCHORDONS",
+                "ACROKERATOSIS VERRUCIFORMIS",
+                "ACROPIGMENTATION",
+                "AMYLOIDOSIS",
+                "ASHY DERMATOSIS",
+                "ATOPIC DERMATITIS",
+                "BROMHIDROSIS",
+                "BULLOUS PEMPHIGOID",
+                "CARBUNCLE",
+                "CHALAZION",
+                "CHICKENPOX",
+                "CHILBLAINS",
+                "CORNS",
+                "CUTANEOUS CANDIDIASIS",
+                "DANDRUFF",
+                "DARIER'S DISEASE",
+                "DERMATITIS HERPETIFORMIS",
+                "EPIDERMOLYSIS BULLOSA",
+                "FOLLICULITIS DECALVANS",
+                "FRECKLES",
+                "FUNGAL",
+                "HANSENS",
+                "HENOCH-SCHÖNLEIN PURPURA",
+                "HERPES SIMPLEX",
+                "HERPES ZOSTER",
+                "HIDRADENITIS SUPPURATIVA",
+                "HYPERHIDROSIS",
+                "HYPERPIGMENTATION",
+                "ICHTHYOSIS",
+                "IDIOPATHIC GUTTATE HYPOMELANOSIS",
+                "KELOIDS",
+                "KERATODERMA",
+                "KERATOSIS PILARIS",
+                "LENTIGENES",
+                "LEPROSY ULCER",
+                "LICHEN PLANUS",
+                "LICHEN STRIATUS",
+                "LIPOID PROTEINOSIS",
+                "LUPOMA",
+                "LUPUS",
+                "MACULAR AMYLOIDOSIS",
+                "MELASMA",
+                "MOLES",
+                "MOLLUSCUM CONTAGIOSUM",
+                "MORPHEA",
+                "NEUROFIBROMATOSIS",
+                "NEVUS",
+                "ONYCHOMYCOSIS",
+                "PAPULAR SARCOIDOSIS",
+                "PEMPHIGUS",
+                "PHRYNODERMA",
+                "PITYRIASIS ALBA",
+                "PITYRIASIS VERSICOLOR",
+                "PLANTAR WARTS",
+                "PLEVA",
+                "POLYMORPHOUS LIGHT ERUPTION",
+                "POMPHOLYX",
+                "PROKERATOSIS",
+                "PRURIGO NODULARIS",
+                "PSORIASIS",
+                "SCABIES",
+                "SCHAMBERG'S PURPURA",
+                "SCLERODERMA",
+                "SEBACEOUS CYST",
+                "SEBORRHEIC DERMATITIS",
+                "SUBCORNEAL PUSTULAR DERMATOSIS",
+                "TINEA",
+                "TUBEROSCLEROSIS",
+                "URTICARIA",
+                "VASCULITIS",
+                "VITILIGO",
+                "WARTS",
+                "XANTHELASMA",
+                "XERODERMA PIGMENTOSUM"
             ],
             "STRESS_MANAGEMENT": [
-              "ANXIETY",
-              "DEPRESSION",
-              "INSOMNIA",
-              "IRRITABLE BOWEL SYNDROME",
-              "MIGRAINE"
+                "ANXIETY",
+                "DEPRESSION",
+                "INSOMNIA",
+                "IRRITABLE BOWEL SYNDROME",
+                "MIGRAINE"
             ],
             "TEEN_AND_ADOLESCENCE": [
-              "ADDICTIONS",
-              "ANOREXIA/BULIMIA"
+                "ADDICTIONS",
+                "ANOREXIA/BULIMIA"
             ],
             "URINARY": [
-              "BENIGN PROSTATIC HYPERTROPHY (BPH)",
-              "KIDNEY STONES",
-              "STRESS INCONTINENCE",
-              "URINARY TRACT INFECTION"
+                "BENIGN PROSTATIC HYPERTROPHY (BPH)",
+                "KIDNEY STONES",
+                "STRESS INCONTINENCE",
+                "URINARY TRACT INFECTION"
             ],
             "WEIGHT_MANAGEMENT": [
-              "OBESITY",
-              "UNDER WEIGHT"
+                "OBESITY",
+                "UNDER WEIGHT"
             ],
             "WOMENS_HEALTH": [
-              "DYSMENORRHEA",
-              "ENDOMETRIOSIS",
-              "FIBROADENOMA",
-              "INFERTILITY",
-              "LEUCORRHOEA",
-              "MENOPAUSE",
-              "OSTEOPOROSIS",
-              "PCOS",
-              "PMS",
-              "PREGNANCY",
-              "THYROID_DISORDERS",
-              "UTERINE FIBROIDS",
-              "UTERINE PROLAPSE",
-              "VAGINAL PROLAPSE"
+                "DYSMENORRHEA",
+                "ENDOMETRIOSIS",
+                "FIBROADENOMA",
+                "INFERTILITY",
+                "LEUCORRHOEA",
+                "MENOPAUSE",
+                "OSTEOPOROSIS",
+                "PCOS",
+                "PMS",
+                "PREGNANCY",
+                "THYROID_DISORDERS",
+                "UTERINE FIBROIDS",
+                "UTERINE PROLAPSE",
+                "VAGINAL PROLAPSE"
             ]
-          }
-        },
-        {
-          "id": "q204",
-          "question": "Sub-Sub-Segment",
-          "type": "select",
-          "options": {
-            "GASTROINTESTINAL DISORDER": [
-              "CONSTIPATION",
-              "DYSPEPSIA/INDIGESTION",
-              "GASTRITIS",
-              "GASTROENTRITIS",
-              "WORM INFECTION"
-            ],
-            "THYROID DISORDERS": [
-              "HYPERTHYROID",
-              "HYPOTHYROID"
-            ],
-            "DIABETES MELLITUS": [
-              "TYPE I",
-              "TYPE II"
-            ],
-            "GALL BLADDER DISEASE": [
-              "CHOLELITHIASIS/GALL STONES"
-            ],
-            "PATCHY HAIR LOSS": [
-              "NON-SCARRING ALOPECIA/ALOPECIA AREATA",
-              "SCARRING ALOPECIA/CICATRICAL ALOPECIA"
-            ],
-            "ARTHRITIS": [
-              "OSTEOARTHRITIS"
-            ],
-            "MALE SEXUAL HEALTH": [
-              "BALANITIS",
-              "EPIDIDYMITIS",
-              "HYDROCELE",
-              "NOCTURNAL EMISSION",
-              "ORCHITIS"
-            ],
-            "ECZEMA": [
-              "ALLERGIC DERMATITIS",
-              "ATOPIC DERMATITIS",
-              "CONTACT DERMATITIS",
-              "NEURODERMATITIS",
-              "NUMMULAR DERMATITIS",
-              "SEBORRHOEIC DERMATITIS"
-            ],
-            "HANSENS": [
-              "LEPROMATOUS HANSENS",
-              "TUBERCULOID HANSENS"
-            ],
-            "HERPES SIMPLEX": [
-              "HERPES SIMPLEX GENITALIS",
-              "HERPES SIMPLEX LABIALIS"
-            ],
-            "LICHEN PLANUS": [
-              "BULLOUS LICHEN PLANUS",
-              "LICHEN PLANO PILARIS",
-              "LICHEN PLANUS PIGMENTOSUS",
-              "ORAL LICHEN PLANUS"
-            ],
-            "LUPUS": [
-              "DISCOID LUPUS ERYTHEMATOSIS",
-              "SUBACUTE CUTANEOUS LUPUS ERYTHEMATOSIS",
-              "SYSTEMIC LUPUS ERYTHEMATOSIS"
-            ],
-            "NEVUS": [
-              "INFLAMMATORY LINEAR VERRUCOUS EP"
-            ],
-            "PEMPHIGUS": [
-              "PEMPHIGUS FOLIACEUS",
-              "PEMPHIGUS VULGARIS"
-            ],
-            "PSORIASIS": [
-              "ERYTHRODERMIC PSORIASIS",
-              "GUTTATE PSORIASIS",
-              "NAEVOID PSORIASIS",
-              "PALMOPLANTAR PSORIASIS",
-              "PSORIASIS VULGARIS",
-              "PSORIATIC ARTHRITIS",
-              "PUSTULAR PSORIASIS",
-              "SCALP PSORIASIS",
-              "SEBO PSORIASIS"
-            ],
-            "TINEA": [
-              "TINEA CAPITIS",
-              "TINEA CORPORIS",
-              "TINEA CRURIS",
-              "TINEA PEDIS",
-              "TINEA VERSICOLOR"
-            ],
-            "WARTS": [
-              "FILIFORM WARTS",
-              "FLAT WARTS",
-              "GENITAL WARTS",
-              "PERIUNGUAL WARTS",
-              "PLANTAR WARTS",
-              "VERUCCA WARTS"
-            ],
-            "XERODERMA PIGMENTOSUM": [
-              "STRESS MANAGEMENT"
-            ],
-            "ADDICTIONS": [
-              "ALCOHOLISM"
-            ],
-            "URINARY TRACT INFECTION": [
-              "WEIGHT MANAGEMENT"
-            ]
+            }
+          },
+          "sub_sub_segment": {
+            "question": "Sub-Sub-Segment",
+            "options": {
+              "GASTROINTESTINAL DISORDER": [
+                  "CONSTIPATION",
+                  "DYSPEPSIA/INDIGESTION",
+                  "GASTRITIS",
+                  "GASTROENTRITIS",
+                  "WORM INFECTION"
+              ],
+              "THYROID DISORDERS": [
+                  "HYPERTHYROID",
+                  "HYPOTHYROID"
+              ],
+              "DIABETES MELLITUS": [
+                  "TYPE I",
+                  "TYPE II"
+              ],
+              "GALL BLADDER DISEASE": [
+                  "CHOLELITHIASIS/GALL STONES"
+              ],
+              "PATCHY HAIR LOSS": [
+                  "NON-SCARRING ALOPECIA/ALOPECIA AREATA",
+                  "SCARRING ALOPECIA/CICATRICAL ALOPECIA"
+              ],
+              "ARTHRITIS": [
+                  "OSTEOARTHRITIS"
+              ],
+              "MALE SEXUAL HEALTH": [
+                  "BALANITIS",
+                  "EPIDIDYMITIS",
+                  "HYDROCELE",
+                  "NOCTURNAL EMISSION",
+                  "ORCHITIS"
+              ],
+              "ECZEMA": [
+                  "ALLERGIC DERMATITIS",
+                  "ATOPIC DERMATITIS",
+                  "CONTACT DERMATITIS",
+                  "NEURODERMATITIS",
+                  "NUMMULAR DERMATITIS",
+                  "SEBORRHOEIC DERMATITIS"
+              ],
+              "HANSENS": [
+                  "LEPROMATOUS HANSENS",
+                  "TUBERCULOID HANSENS"
+              ],
+              "HERPES SIMPLEX": [
+                  "HERPES SIMPLEX GENITALIS",
+                  "HERPES SIMPLEX LABIALIS"
+              ],
+              "LICHEN PLANUS": [
+                  "BULLOUS LICHEN PLANUS",
+                  "LICHEN PLANO PILARIS",
+                  "LICHEN PLANUS PIGMENTOSUS",
+                  "ORAL LICHEN PLANUS"
+              ],
+              "LUPUS": [
+                  "DISCOID LUPUS ERYTHEMATOSIS",
+                  "SUBACUTE CUTANEOUS LUPUS ERYTHEMATOSIS",
+                  "SYSTEMIC LUPUS ERYTHEMATOSIS"
+              ],
+              "NEVUS": [
+                  "INFLAMMATORY LINEAR VERRUCOUS EP"
+              ],
+              "PEMPHIGUS": [
+                  "PEMPHIGUS FOLIACEUS",
+                  "PEMPHIGUS VULGARIS"
+              ],
+              "PSORIASIS": [
+                  "ERYTHRODERMIC PSORIASIS",
+                  "GUTTATE PSORIASIS",
+                  "NAEVOID PSORIASIS",
+                  "PALMOPLANTAR PSORIASIS",
+                  "PSORIASIS VULGARIS",
+                  "PSORIATIC ARTHRITIS",
+                  "PUSTULAR PSORIASIS",
+                  "SCALP PSORIASIS",
+                  "SEBO PSORIASIS"
+              ],
+              "TINEA": [
+                  "TINEA CAPITIS",
+                  "TINEA CORPORIS",
+                  "TINEA CRURIS",
+                  "TINEA PEDIS",
+                  "TINEA VERSICOLOR"
+              ],
+              "WARTS": [
+                  "FILIFORM WARTS",
+                  "FLAT WARTS",
+                  "GENITAL WARTS",
+                  "PERIUNGUAL WARTS",
+                  "PLANTAR WARTS",
+                  "VERUCCA WARTS"
+              ],
+              "XERODERMA PIGMENTOSUM": [
+                  "STRESS MANAGEMENT"
+              ],
+              "ADDICTIONS": [
+                  "ALCOHOLISM"
+              ],
+              "URINARY TRACT INFECTION": [
+                  "WEIGHT MANAGEMENT"
+              ]
+            }
           }
         },
         {
