@@ -319,7 +319,8 @@ exports.bookAppointment = async (req, res) => {
       email,
       appointmentTime: appointmentTimeIST,
       status: 'BOOKED',
-      queuePosition: bookedCount + 1
+      queuePosition: bookedCount + 1,
+      patientType: 'NP'
     });
 
     const createdAppointment = await newAppointment.save();
