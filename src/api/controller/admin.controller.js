@@ -363,7 +363,7 @@ const scheduleCronJob = async () => {
         const slot = new Slot({
           date: futureDate,
           startTime: startTime || '10:00',
-          endTime: endTime || '18:00',
+          endTime: endTime || '19:00',
           breakTime: breakTime.length
             ? breakTime
             : [{ start: '13:00', end: '14:00' }],
