@@ -362,11 +362,11 @@ const scheduleCronJob = async () => {
 
         const slot = new Slot({
           date: futureDate,
-          startTime: startTime || '09:00',
-          endTime: endTime || '17:00',
+          startTime: startTime || '10:00',
+          endTime: endTime || '18:00',
           breakTime: breakTime.length
             ? breakTime
-            : [{ start: '12:00', end: '13:00' }],
+            : [{ start: '13:00', end: '14:00' }],
           maxSlots: maxSlots || 3
         });
 
