@@ -1181,11 +1181,14 @@ exports.getPatientData = async (req, res) => {
     })
       .sort({ createdDate: -1 })
       .exec();
+    const appointment = await Patient.findOne({ patientId: id });
     if (!prescription) {
       return res.status(StatusCodes.OK).send({
         status: 'Success',
         message: 'This is a new patient',
-        patient: null
+        patient: null,
+        appointmentId: appointment._id,
+        appointmentStatus: appointment.status
       });
     }
     return res.status(StatusCodes.OK).send({
@@ -1194,7 +1197,9 @@ exports.getPatientData = async (req, res) => {
       patient: {
         id: prescription.id,
         ...prescription.patient,
-        diagnosis: prescription.diagnosis
+        appointmentId: appointment._id,
+        diagnosis: prescription.diagnosis,
+        appointmentStatus: appointment.status
       }
     });
   } catch (err) {
