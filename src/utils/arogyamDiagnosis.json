@@ -71,10 +71,7 @@
           "id": "q103",
           "question": "Have you consulted any doctor before? Have you been diagnosed for the same?",
           "type": "select",
-          "options": [
-            "YES",
-            "NO"
-          ],
+          "options": ["YES", "NO"],
           "isRequired": true
         },
         {
@@ -150,9 +147,7 @@
           "id": "q201",
           "question": "Service",
           "type": "select",
-          "options": [
-            "Homeopathy,Aesthetics"
-          ]
+          "options": ["Homeopathy,Aesthetics"]
         },
         {
           "id": "q202",
@@ -202,20 +197,18 @@
                 "GLUTEN INTOLERANCE",
                 "LACTOSE INTOLERANCE",
                 "PROTEIN ALLERGY"
-            ],
-            "ANO RECTAL DISORDER": [
-                "PILES/FISSURE/FISTULA"
-            ],
-            "CANCER/MALIGNANCY": [],
-            "CARDIOVASCULAR": [
+              ],
+              "ANO RECTAL DISORDER": ["PILES/FISSURE/FISTULA"],
+              "CANCER/MALIGNANCY": [],
+              "CARDIOVASCULAR": [
                 "HYPERLIPIDEMIA",
                 "HYPERTENSION",
                 "ISCHAEMIC HEART DISEASE/LEFT VENTRICULAR FAILURE",
                 "PULMONARY HYPERTENSION",
                 "RESTRICTIVE CARDIOMYOPATHY",
                 "RHEUMATIC HEART DISEASE"
-            ],
-            "CHILDREN DISORDERS": [
+              ],
+              "CHILDREN DISORDERS": [
                 "ATTENTION DEFICIT DISORDER",
                 "AUTISM",
                 "BED WETTING",
@@ -225,35 +218,26 @@
                 "G.MEMORY",
                 "H.POOR APPETITE",
                 "I.POOR IMMUNITY"
-            ],
-            "CIRCULATORY DISORDERS": [
-                "DVS",
-                "HAEMANGIOMA",
-                "VARICOSE VEINS"
-            ],
-            "CENTRAL NERVOUS SYSTEM": [
+              ],
+              "CIRCULATORY DISORDERS": ["DVS", "HAEMANGIOMA", "VARICOSE VEINS"],
+              "CENTRAL NERVOUS SYSTEM": [
                 "CEREBRAL PALSY",
                 "EPILEPSY",
                 "VERTIGO"
-            ],
-            "DE ADDICTION": [
+              ],
+              "DE ADDICTION": [
                 "ALCOHOLISM",
                 "DIGITAL ADDICTION",
                 "SUBSTANCE ADDICTION"
-            ],
-            "DENTITION": [
-                "CARIES"
-            ],
-            "ENDOCRINE": [
+              ],
+              "DENTITION": ["CARIES"],
+              "ENDOCRINE": [
                 "THYROID DISORDERS",
                 "DIABETES MELLITUS",
                 "DIABETES INSIPIDUS"
-            ],
-            "ENT": [
-                "OTITIS MEDIA",
-                "TINNITUS"
-            ],
-            "GASTROINTESTINAL": [
+              ],
+              "ENT": ["OTITIS MEDIA", "TINNITUS"],
+              "GASTROINTESTINAL": [
                 "ACID REFLUX",
                 "BUDD CHIARI SYNDROME",
                 "CHRONIC AMOEBIASIS",
@@ -273,15 +257,15 @@
                 "PEPTIC ULCERS",
                 "RECURRENT APTHAE",
                 "ULCERATIVE COLITIS"
-            ],
-            "HAEMATOLOGICAL": [
+              ],
+              "HAEMATOLOGICAL": [
                 "APLASTIC ANAEMIA",
                 "CHRONIC MYELOID LEUKAEMIA",
                 "NON-HODGKINS LYMPHOMA",
                 "THALASSAEMIA",
                 "VON WILLEBRAND'S DISEASE"
-            ],
-            "HAIR": [
+              ],
+              "HAIR": [
                 "AGA FEMALE",
                 "AGA MALE",
                 "CANITIES",
@@ -290,9 +274,9 @@
                 "TELOGEN EFFLUVIUM",
                 "TRICHOTILLOMANIA",
                 "WOOLY HAIR SYNDROME"
-            ],
-            "MIND": [],
-            "MUSCULOSKELETAL SYSTEM": [
+              ],
+              "MIND": [],
+              "MUSCULOSKELETAL SYSTEM": [
                 "ANKYLOSING SPONDYLITIS",
                 "ARTHRITIS",
                 "BACKACHE",
@@ -306,8 +290,8 @@
                 "RHEUMATOID ARTHRITIS",
                 "STILLS DISEASE",
                 "SYSTEMIC LUPUS ERYTHEMATOSUS"
-            ],
-            "NEUROLOGICAL": [
+              ],
+              "NEUROLOGICAL": [
                 "ALZHEIMERS",
                 "ATAXIA",
                 "CEREBRAL SPACE OCCUPYING LESION",
@@ -318,12 +302,9 @@
                 "PETIT MAL EPILEPSY",
                 "SPASTIC CEREBRAL PALSY",
                 "TRIGEMINAL NEURALGIA"
-            ],
-            "OPHTHALMOLOGICAL DISORDER": [
-                "MYOPIA",
-                "HYPEROPIA"
-            ],
-            "PAIN MANAGEMENT": [
+              ],
+              "OPHTHALMOLOGICAL DISORDER": ["MYOPIA", "HYPEROPIA"],
+              "PAIN MANAGEMENT": [
                 "ACHILLES TENDINITIS PAIN (ANKLE PAIN)",
                 "ANKYLOSING SPONDYLOSIS PAIN",
                 "APPENDICITIS PAIN",
@@ -375,15 +356,15 @@
                 "TRAPEZITIS PAIN",
                 "TRIGEMINAL NEURALGIA PAIN",
                 "UVITIS PAIN"
-            ],
-            "PSYCHIATRIC": [
+              ],
+              "PSYCHIATRIC": [
                 "ANXIETY NEUROSIS",
                 "CONVERSION REACTION",
                 "MENTAL RETARDATION",
                 "PANIC DISORDER",
                 "SCHIZOPHRENIA"
-            ],
-            "RENAL": [
+              ],
+              "RENAL": [
                 "ACUTE RENAL FAILURE",
                 "CHRONIC CYSTITIS",
                 "CHRONIC RENAL FAILURE",
@@ -393,8 +374,8 @@
                 "RENAL CALCULUS",
                 "RENAL STONES",
                 "URINARY TRACT INFECTION"
-            ],
-            "RESPIRATORY": [
+              ],
+              "RESPIRATORY": [
                 "ALLERGIC BRONCHITIS",
                 "ASPERGILLOSIS",
                 "CHRONIC BRONCHIECTASIS",
@@ -409,12 +390,12 @@
                 "SLEEP APNOEA",
                 "TONSILLITIS",
                 "WEGENER'S GRANULOMATOSIS PROTOCOL"
-            ],
-            "RHEUMATOLOGY": [
+              ],
+              "RHEUMATOLOGY": [
                 "JUVENILE RHEUMATIC ARTHRITIS",
                 "RHEUMATIC FEVER"
-            ],
-            "SEXUAL_HEALTH": [
+              ],
+              "SEXUAL_HEALTH": [
                 "ERECTILE DYSFUNCTION",
                 "FEMALE SEXUAL HEALTH",
                 "GENITAL WARTS",
@@ -423,8 +404,8 @@
                 "PREMATURE EJACULATION",
                 "SYPHILIS",
                 "VARICOCELE"
-            ],
-            "SKIN": [
+              ],
+              "SKIN": [
                 "ACNE",
                 "ACNE ROSACEA",
                 "ACROCHORDONS",
@@ -501,29 +482,23 @@
                 "WARTS",
                 "XANTHELASMA",
                 "XERODERMA PIGMENTOSUM"
-            ],
-            "STRESS_MANAGEMENT": [
+              ],
+              "STRESS_MANAGEMENT": [
                 "ANXIETY",
                 "DEPRESSION",
                 "INSOMNIA",
                 "IRRITABLE BOWEL SYNDROME",
                 "MIGRAINE"
-            ],
-            "TEEN_AND_ADOLESCENCE": [
-                "ADDICTIONS",
-                "ANOREXIA/BULIMIA"
-            ],
-            "URINARY": [
+              ],
+              "TEEN_AND_ADOLESCENCE": ["ADDICTIONS", "ANOREXIA/BULIMIA"],
+              "URINARY": [
                 "BENIGN PROSTATIC HYPERTROPHY (BPH)",
                 "KIDNEY STONES",
                 "STRESS INCONTINENCE",
                 "URINARY TRACT INFECTION"
-            ],
-            "WEIGHT_MANAGEMENT": [
-                "OBESITY",
-                "UNDER WEIGHT"
-            ],
-            "WOMENS_HEALTH": [
+              ],
+              "WEIGHT_MANAGEMENT": ["OBESITY", "UNDER WEIGHT"],
+              "WOMENS_HEALTH": [
                 "DYSMENORRHEA",
                 "ENDOMETRIOSIS",
                 "FIBROADENOMA",
@@ -538,113 +513,89 @@
                 "UTERINE FIBROIDS",
                 "UTERINE PROLAPSE",
                 "VAGINAL PROLAPSE"
-            ]
+              ]
             }
           },
           "sub_sub_segment": {
             "question": "Sub-Sub-Segment",
             "options": {
               "GASTROINTESTINAL DISORDER": [
-                  "CONSTIPATION",
-                  "DYSPEPSIA/INDIGESTION",
-                  "GASTRITIS",
-                  "GASTROENTRITIS",
-                  "WORM INFECTION"
+                "CONSTIPATION",
+                "DYSPEPSIA/INDIGESTION",
+                "GASTRITIS",
+                "GASTROENTRITIS",
+                "WORM INFECTION"
               ],
-              "THYROID DISORDERS": [
-                  "HYPERTHYROID",
-                  "HYPOTHYROID"
-              ],
-              "DIABETES MELLITUS": [
-                  "TYPE I",
-                  "TYPE II"
-              ],
-              "GALL BLADDER DISEASE": [
-                  "CHOLELITHIASIS/GALL STONES"
-              ],
+              "THYROID DISORDERS": ["HYPERTHYROID", "HYPOTHYROID"],
+              "DIABETES MELLITUS": ["TYPE I", "TYPE II"],
+              "GALL BLADDER DISEASE": ["CHOLELITHIASIS/GALL STONES"],
               "PATCHY HAIR LOSS": [
-                  "NON-SCARRING ALOPECIA/ALOPECIA AREATA",
-                  "SCARRING ALOPECIA/CICATRICAL ALOPECIA"
+                "NON-SCARRING ALOPECIA/ALOPECIA AREATA",
+                "SCARRING ALOPECIA/CICATRICAL ALOPECIA"
               ],
-              "ARTHRITIS": [
-                  "OSTEOARTHRITIS"
-              ],
+              "ARTHRITIS": ["OSTEOARTHRITIS"],
               "MALE SEXUAL HEALTH": [
-                  "BALANITIS",
-                  "EPIDIDYMITIS",
-                  "HYDROCELE",
-                  "NOCTURNAL EMISSION",
-                  "ORCHITIS"
+                "BALANITIS",
+                "EPIDIDYMITIS",
+                "HYDROCELE",
+                "NOCTURNAL EMISSION",
+                "ORCHITIS"
               ],
               "ECZEMA": [
-                  "ALLERGIC DERMATITIS",
-                  "ATOPIC DERMATITIS",
-                  "CONTACT DERMATITIS",
-                  "NEURODERMATITIS",
-                  "NUMMULAR DERMATITIS",
-                  "SEBORRHOEIC DERMATITIS"
+                "ALLERGIC DERMATITIS",
+                "ATOPIC DERMATITIS",
+                "CONTACT DERMATITIS",
+                "NEURODERMATITIS",
+                "NUMMULAR DERMATITIS",
+                "SEBORRHOEIC DERMATITIS"
               ],
-              "HANSENS": [
-                  "LEPROMATOUS HANSENS",
-                  "TUBERCULOID HANSENS"
-              ],
+              "HANSENS": ["LEPROMATOUS HANSENS", "TUBERCULOID HANSENS"],
               "HERPES SIMPLEX": [
-                  "HERPES SIMPLEX GENITALIS",
-                  "HERPES SIMPLEX LABIALIS"
+                "HERPES SIMPLEX GENITALIS",
+                "HERPES SIMPLEX LABIALIS"
               ],
               "LICHEN PLANUS": [
-                  "BULLOUS LICHEN PLANUS",
-                  "LICHEN PLANO PILARIS",
-                  "LICHEN PLANUS PIGMENTOSUS",
-                  "ORAL LICHEN PLANUS"
+                "BULLOUS LICHEN PLANUS",
+                "LICHEN PLANO PILARIS",
+                "LICHEN PLANUS PIGMENTOSUS",
+                "ORAL LICHEN PLANUS"
               ],
               "LUPUS": [
-                  "DISCOID LUPUS ERYTHEMATOSIS",
-                  "SUBACUTE CUTANEOUS LUPUS ERYTHEMATOSIS",
-                  "SYSTEMIC LUPUS ERYTHEMATOSIS"
+                "DISCOID LUPUS ERYTHEMATOSIS",
+                "SUBACUTE CUTANEOUS LUPUS ERYTHEMATOSIS",
+                "SYSTEMIC LUPUS ERYTHEMATOSIS"
               ],
-              "NEVUS": [
-                  "INFLAMMATORY LINEAR VERRUCOUS EP"
-              ],
-              "PEMPHIGUS": [
-                  "PEMPHIGUS FOLIACEUS",
-                  "PEMPHIGUS VULGARIS"
-              ],
+              "NEVUS": ["INFLAMMATORY LINEAR VERRUCOUS EP"],
+              "PEMPHIGUS": ["PEMPHIGUS FOLIACEUS", "PEMPHIGUS VULGARIS"],
               "PSORIASIS": [
-                  "ERYTHRODERMIC PSORIASIS",
-                  "GUTTATE PSORIASIS",
-                  "NAEVOID PSORIASIS",
-                  "PALMOPLANTAR PSORIASIS",
-                  "PSORIASIS VULGARIS",
-                  "PSORIATIC ARTHRITIS",
-                  "PUSTULAR PSORIASIS",
-                  "SCALP PSORIASIS",
-                  "SEBO PSORIASIS"
+                "ERYTHRODERMIC PSORIASIS",
+                "GUTTATE PSORIASIS",
+                "NAEVOID PSORIASIS",
+                "PALMOPLANTAR PSORIASIS",
+                "PSORIASIS VULGARIS",
+                "PSORIATIC ARTHRITIS",
+                "PUSTULAR PSORIASIS",
+                "SCALP PSORIASIS",
+                "SEBO PSORIASIS"
               ],
               "TINEA": [
-                  "TINEA CAPITIS",
-                  "TINEA CORPORIS",
-                  "TINEA CRURIS",
-                  "TINEA PEDIS",
-                  "TINEA VERSICOLOR"
+                "TINEA CAPITIS",
+                "TINEA CORPORIS",
+                "TINEA CRURIS",
+                "TINEA PEDIS",
+                "TINEA VERSICOLOR"
               ],
               "WARTS": [
-                  "FILIFORM WARTS",
-                  "FLAT WARTS",
-                  "GENITAL WARTS",
-                  "PERIUNGUAL WARTS",
-                  "PLANTAR WARTS",
-                  "VERUCCA WARTS"
+                "FILIFORM WARTS",
+                "FLAT WARTS",
+                "GENITAL WARTS",
+                "PERIUNGUAL WARTS",
+                "PLANTAR WARTS",
+                "VERUCCA WARTS"
               ],
-              "XERODERMA PIGMENTOSUM": [
-                  "STRESS MANAGEMENT"
-              ],
-              "ADDICTIONS": [
-                  "ALCOHOLISM"
-              ],
-              "URINARY TRACT INFECTION": [
-                  "WEIGHT MANAGEMENT"
-              ]
+              "XERODERMA PIGMENTOSUM": ["STRESS MANAGEMENT"],
+              "ADDICTIONS": ["ALCOHOLISM"],
+              "URINARY TRACT INFECTION": ["WEIGHT MANAGEMENT"]
             }
           }
         },
@@ -720,10 +671,7 @@
           "id": "q302",
           "question": "Anyone in your family suffering from?",
           "type": "select",
-          "options": [
-            "Yes",
-            "No"
-          ]
+          "options": ["Yes", "No"]
         },
         {
           "id": "q303",
@@ -743,11 +691,7 @@
             {
               "question": "Type of Stress",
               "type": "select",
-              "options": [
-                "Recent",
-                "Longstanding",
-                "No Stress"
-              ]
+              "options": ["Recent", "Longstanding", "No Stress"]
             },
             {
               "question": "Specify the type of Stress.",
@@ -811,20 +755,12 @@
             {
               "question": "Alternative Treatment",
               "type": "select",
-              "options": [
-                "Homeopathy",
-                "Ayurvedic",
-                "Naturopathy"
-              ]
+              "options": ["Homeopathy", "Ayurvedic", "Naturopathy"]
             },
             {
               "question": "Cosmetic Treatments",
               "type": "select",
-              "options": [
-                "Mesotherapy",
-                "Dermarollers",
-                "Injections"
-              ]
+              "options": ["Mesotherapy", "Dermarollers", "Injections"]
             },
             {
               "question": "Surgery",
@@ -848,41 +784,31 @@
             {
               "question": "Chew Tobacco / Pan Masala",
               "type": "select",
-              "options": [
-                "Yes, No"
-              ],
+              "options": ["Yes, No"],
               "isRequired": true
             },
             {
               "question": "Caffeine",
               "type": "select",
-              "options": [
-                "Yes, No"
-              ],
+              "options": ["Yes, No"],
               "isRequired": true
             },
             {
               "question": "Tea",
               "type": "select",
-              "options": [
-                "Yes, No"
-              ],
+              "options": ["Yes, No"],
               "isRequired": true
             },
             {
               "question": "Alcohol",
               "type": "select",
-              "options": [
-                "Yes, No"
-              ],
+              "options": ["Yes, No"],
               "isRequired": true
             },
             {
               "question": "Smoking",
               "type": "select",
-              "options": [
-                "Yes, No"
-              ],
+              "options": ["Yes, No"],
               "isRequired": true
             },
             {
@@ -969,11 +895,7 @@
           "id": "q501",
           "question": "Appetite",
           "type": "select",
-          "options": [
-            "Decreased",
-            "Increased",
-            "Normal"
-          ]
+          "options": ["Decreased", "Increased", "Normal"]
         },
         {
           "id": "q502",
@@ -1087,11 +1009,7 @@
             {
               "question": "Usually?",
               "type": "select",
-              "options": [
-                "Decreased",
-                "Increased",
-                "Normal"
-              ]
+              "options": ["Decreased", "Increased", "Normal"]
             },
             {
               "question": "Prefer?",
@@ -1117,11 +1035,7 @@
             {
               "question": "Stain",
               "type": "select",
-              "options": [
-                "NONE",
-                "WHITE",
-                "YELLOW"
-              ]
+              "options": ["NONE", "WHITE", "YELLOW"]
             },
             {
               "question": "Quantity",
@@ -1136,11 +1050,7 @@
             {
               "question": "Odour",
               "type": "select",
-              "options": [
-                "SELECT",
-                "OFFENSIVE",
-                "NON OFFENSIVE"
-              ]
+              "options": ["SELECT", "OFFENSIVE", "NON OFFENSIVE"]
             },
             {
               "question": "Parts",
@@ -1166,50 +1076,27 @@
             {
               "question": "Covering",
               "type": "select",
-              "options": [
-                "Not Required",
-                "Thin",
-                "Thick"
-              ]
+              "options": ["Not Required", "Thin", "Thick"]
             },
             {
               "question": "Thermally patient is",
               "type": "select",
-              "options": [
-                "Ambithermal",
-                "Chilly",
-                "Hot"
-              ]
+              "options": ["Ambithermal", "Chilly", "Hot"]
             },
             {
               "question": "Bathing",
               "type": "select",
-              "options": [
-                "BOTH",
-                "Cold Water",
-                "Hot Water",
-                "Seasonal"
-              ]
+              "options": ["BOTH", "Cold Water", "Hot Water", "Seasonal"]
             },
             {
               "question": "Seasonal Preference",
               "type": "select",
-              "options": [
-                "All",
-                "None",
-                "Rainy",
-                "Winter",
-                "Summer"
-              ]
+              "options": ["All", "None", "Rainy", "Winter", "Summer"]
             },
             {
               "question": "Prefers",
               "type": "select",
-              "options": [
-                "AC",
-                "FAN",
-                "NONE"
-              ]
+              "options": ["AC", "FAN", "NONE"]
             }
           ]
         },
