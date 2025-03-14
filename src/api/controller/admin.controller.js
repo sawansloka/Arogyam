@@ -7,14 +7,18 @@ const {
   jwtSecretKey,
   digitalOceanService
 } = require('../../config/vars');
-const { toIST } = require('../../utils/publicHelper');
+const {
+  toIST,
+  convertToKebabCase,
+  convertDateFormat
+} = require('../../utils/publicHelper');
 const ClinicMetaData = require('../../model/clinicMetaData');
 const CustomerFeedback = require('../../model/customerFeedback');
 const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
 const Admin = require('../../model/admin');
 const Prescription = require('../../model/prescription');
-const { uploadPdfToGoogleDrive } = require('../../utils/googleHelper');
+// const { uploadPdfToGoogleDrive } = require('../../utils/googleHelper');
 const { renderPdf } = require('../../utils/renderFile');
 const { uploadToS3 } = require('../../utils/s3');
 const ArogyamDiagnosis = require('../../utils/arogyamDiagnosis.json');
@@ -118,7 +122,7 @@ exports.updateClinicMetaData = async (req, res) => {
     const { filename, title, body, question, answer, schedule } = req.body;
     if (filename) {
       const fileBuffer = req.file.buffer;
-      await uploadToS3(fileBuffer, filename);
+      await uploadToS3(fileBuffer, filename, digitalOceanService.s3Bucket);
       existingMetaData.bannerUrl = `${digitalOceanService.originUrl}/${filename}`;
     }
     if (title) existingMetaData.desc.title = title;
@@ -1140,11 +1144,18 @@ exports.generatePrescriptionPDF = async (req, res) => {
     count = existingPatient.prescription.url ? (count += 1) : 1;
 
     // Upload to Google Drive and get the link
-    const pdfLink = await uploadPdfToGoogleDrive(
+    const fileName = `${patient.patientId}-${convertToKebabCase(patient.name)}-${count}-${convertDateFormat(toIST(new Date()).toLocaleDateString())}-prescription.pdf`;
+
+    // const pdfLink = await uploadPdfToGoogleDrive(pdfBuffer, fileName);
+    await uploadToS3(
       pdfBuffer,
-      `${patient.patientId}-${patient.name}-${count}-${toIST(new Date())}-prescription.pdf`
+      fileName,
+      digitalOceanService.s3Bucket,
+      digitalOceanService.prescriptionFolder
     );
-    console.log(`PDF uploaded to Google Drive with link: ${pdfLink}`);
+    const prescriptionUrl = `${digitalOceanService.originUrl}/${digitalOceanService.prescriptionFolder}/${fileName}`;
+
+    console.log(`PDF uploaded to Google Drive with link: ${prescriptionUrl}`);
 
     if (existingPatient.prescription.url) {
       existingPatient.visitedPrescriptionUrls.push({
@@ -1154,7 +1165,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
     }
 
     existingPatient.prescription = {
-      url: pdfLink,
+      url: prescriptionUrl,
       date: toIST(new Date())
     };
 
@@ -1163,7 +1174,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       message: 'PDF generated successfully',
-      pdfLink
+      pdfLink: prescriptionUrl
     });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({

@@ -784,31 +784,31 @@
             {
               "question": "Chew Tobacco / Pan Masala",
               "type": "select",
-              "options": ["Yes, No"],
+              "options": ["Yes", "No"],
               "isRequired": true
             },
             {
               "question": "Caffeine",
               "type": "select",
-              "options": ["Yes, No"],
+              "options": ["Yes", "No"],
               "isRequired": true
             },
             {
               "question": "Tea",
               "type": "select",
-              "options": ["Yes, No"],
+              "options": ["Yes", "No"],
               "isRequired": true
             },
             {
               "question": "Alcohol",
               "type": "select",
-              "options": ["Yes, No"],
+              "options": ["Yes", "No"],
               "isRequired": true
             },
             {
               "question": "Smoking",
               "type": "select",
-              "options": ["Yes, No"],
+              "options": ["Yes", "No"],
               "isRequired": true
             },
             {
