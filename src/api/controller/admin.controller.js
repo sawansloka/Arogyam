@@ -1,6 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 const cron = require('node-cron');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 const {
   adminSecretKey,
   nonDocSecretKey,
@@ -1175,6 +1176,44 @@ exports.generatePrescriptionPDF = async (req, res) => {
       status: 'Success',
       message: 'PDF generated successfully',
       pdfLink: prescriptionUrl
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
+exports.downloadPrescription = async (req, res) => {
+  try {
+    const { patientId } = req.body;
+    const prescription = await Prescription.findOne({
+      'patient.patientId': patientId
+    });
+
+    const existingPatient = await Patient.findOne({
+      patientId
+    });
+
+    if (
+      !prescription ||
+      !existingPatient ||
+      !existingPatient.prescription ||
+      !existingPatient.prescription.url
+    ) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Prescription not found'
+      });
+    }
+    const pdfLink = existingPatient.prescription.url;
+    const response = await axios.get(pdfLink, { responseType: 'arraybuffer' });
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'PDF downloaded successfully',
+      pdfBuffer: response.data
     });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
