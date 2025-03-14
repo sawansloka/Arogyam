@@ -10,7 +10,10 @@ router.get('/app/health', (req, res) => {
 });
 
 router.get('/app/deephealth', (req, res) => {
-  res.send({ message: 'Server is running very well!!!', status: httpStatus.OK });
+  res.send({
+    message: 'Server is running very well!!!',
+    status: httpStatus.OK
+  });
 });
 
 router.use('/v1/admin', adminRoutes);

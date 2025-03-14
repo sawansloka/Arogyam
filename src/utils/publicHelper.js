@@ -23,3 +23,7 @@ exports.converBase64ToBuffer = (base64) => {
   const base64Data = base64.replace(/^data:image\/\w+;base64,/, '');
   return Buffer.from(base64Data, 'base64');
 };
+
+exports.convertToKebabCase = (str) => str.trim().replace(/\s+/g, '-');
+
+exports.convertDateFormat = (dateStr) => dateStr.replace(/\//g, '-');

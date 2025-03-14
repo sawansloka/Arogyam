@@ -1,20 +1,25 @@
 const { StatusCodes } = require('http-status-codes');
 const cron = require('node-cron');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 const {
   adminSecretKey,
   nonDocSecretKey,
   jwtSecretKey,
   digitalOceanService
 } = require('../../config/vars');
-const { toIST } = require('../../utils/publicHelper');
+const {
+  toIST,
+  convertToKebabCase,
+  convertDateFormat
+} = require('../../utils/publicHelper');
 const ClinicMetaData = require('../../model/clinicMetaData');
 const CustomerFeedback = require('../../model/customerFeedback');
 const Patient = require('../../model/patient');
 const Slot = require('../../model/slot');
 const Admin = require('../../model/admin');
 const Prescription = require('../../model/prescription');
-const { uploadPdfToGoogleDrive } = require('../../utils/googleHelper');
+// const { uploadPdfToGoogleDrive } = require('../../utils/googleHelper');
 const { renderPdf } = require('../../utils/renderFile');
 const { uploadToS3 } = require('../../utils/s3');
 const ArogyamDiagnosis = require('../../utils/arogyamDiagnosis.json');
@@ -118,7 +123,7 @@ exports.updateClinicMetaData = async (req, res) => {
     const { filename, title, body, question, answer, schedule } = req.body;
     if (filename) {
       const fileBuffer = req.file.buffer;
-      await uploadToS3(fileBuffer, filename);
+      await uploadToS3(fileBuffer, filename, digitalOceanService.s3Bucket);
       existingMetaData.bannerUrl = `${digitalOceanService.originUrl}/${filename}`;
     }
     if (title) existingMetaData.desc.title = title;
@@ -1140,11 +1145,18 @@ exports.generatePrescriptionPDF = async (req, res) => {
     count = existingPatient.prescription.url ? (count += 1) : 1;
 
     // Upload to Google Drive and get the link
-    const pdfLink = await uploadPdfToGoogleDrive(
+    const fileName = `${patient.patientId}-${convertToKebabCase(patient.name)}-${count}-${convertDateFormat(toIST(new Date()).toLocaleDateString())}-prescription.pdf`;
+
+    // const pdfLink = await uploadPdfToGoogleDrive(pdfBuffer, fileName);
+    await uploadToS3(
       pdfBuffer,
-      `${patient.patientId}-${patient.name}-${count}-${toIST(new Date())}-prescription.pdf`
+      fileName,
+      digitalOceanService.s3Bucket,
+      digitalOceanService.prescriptionFolder
     );
-    console.log(`PDF uploaded to Google Drive with link: ${pdfLink}`);
+    const prescriptionUrl = `${digitalOceanService.originUrl}/${digitalOceanService.prescriptionFolder}/${fileName}`;
+
+    console.log(`PDF uploaded to Google Drive with link: ${prescriptionUrl}`);
 
     if (existingPatient.prescription.url) {
       existingPatient.visitedPrescriptionUrls.push({
@@ -1154,7 +1166,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
     }
 
     existingPatient.prescription = {
-      url: pdfLink,
+      url: prescriptionUrl,
       date: toIST(new Date())
     };
 
@@ -1163,7 +1175,45 @@ exports.generatePrescriptionPDF = async (req, res) => {
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       message: 'PDF generated successfully',
-      pdfLink
+      pdfLink: prescriptionUrl
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Error',
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
+exports.downloadPrescription = async (req, res) => {
+  try {
+    const { patientId } = req.query;
+    const prescription = await Prescription.findOne({
+      'patient.patientId': patientId
+    });
+
+    const existingPatient = await Patient.findOne({
+      patientId
+    });
+
+    if (
+      !prescription ||
+      !existingPatient ||
+      !existingPatient.prescription ||
+      !existingPatient.prescription.url
+    ) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Prescription not found'
+      });
+    }
+    const pdfLink = existingPatient.prescription.url;
+    const response = await axios.get(pdfLink, { responseType: 'arraybuffer' });
+
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'PDF downloaded successfully',
+      pdfBuffer: response.data
     });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
@@ -1176,27 +1226,56 @@ exports.generatePrescriptionPDF = async (req, res) => {
 exports.getPatientData = async (req, res) => {
   try {
     const { id } = req.params;
-    const prescription = await Prescription.findOne({
+    const prescription = await Prescription.find({
       'patient.patientId': id
     })
       .sort({ createdDate: -1 })
       .exec();
-    if (!prescription) {
+
+    const appointment = await Patient.findOne({ patientId: id });
+    const { visitedAppointmentTime } = appointment;
+    if (!prescription || !prescription.length) {
       return res.status(StatusCodes.OK).send({
         status: 'Success',
         message: 'This is a new patient',
-        patient: null
+        data: {
+          patientCode: 'NEW_PATIENT',
+          patient: {
+            name: appointment.name,
+            phone: appointment.phone,
+            patientId: appointment.patientId
+          },
+          appointmentId: appointment._id,
+          appointmentStatus: appointment.status
+        }
       });
     }
-    return res.status(StatusCodes.OK).send({
-      status: 'Success',
-      message: 'This is an existing patient',
-      patient: {
-        id: prescription.id,
-        ...prescription.patient,
-        diagnosis: prescription.diagnosis
-      }
-    });
+    if (visitedAppointmentTime.length <= prescription.length) {
+      return res.status(StatusCodes.OK).send({
+        status: 'Success',
+        message: 'This is an existing patient',
+        data: {
+          patientCode:
+            visitedAppointmentTime.length === prescription.length
+              ? 'FOLLOW_UP_PATIENT'
+              : 'INPROGRESS_PATIENT',
+          patient: {
+            ...prescription[0].patient
+          },
+          ...(visitedAppointmentTime.length < prescription.length && {
+            diagnosis: prescription[0].diagnosis,
+            complaints: prescription[0].complaints,
+            findings: prescription[0].findings,
+            advice: prescription[0].advice,
+            prescriptionItems: prescription[0].prescriptionItems,
+            followUpDate: prescription[0].followUpDate,
+            prescriptionId: prescription[0]._id
+          }),
+          appointmentId: appointment._id,
+          appointmentStatus: appointment.status
+        }
+      });
+    }
   } catch (err) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
