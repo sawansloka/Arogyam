@@ -1176,32 +1176,56 @@ exports.generatePrescriptionPDF = async (req, res) => {
 exports.getPatientData = async (req, res) => {
   try {
     const { id } = req.params;
-    const prescription = await Prescription.findOne({
+    const prescription = await Prescription.find({
       'patient.patientId': id
     })
       .sort({ createdDate: -1 })
       .exec();
+
     const appointment = await Patient.findOne({ patientId: id });
-    if (!prescription) {
+    const { visitedAppointmentTime } = appointment;
+    if (!prescription || !prescription.length) {
       return res.status(StatusCodes.OK).send({
         status: 'Success',
         message: 'This is a new patient',
-        patient: null,
-        appointmentId: appointment._id,
-        appointmentStatus: appointment.status
+        data: {
+          patientCode: 'NEW_PATIENT',
+          patient: {
+            name: appointment.name,
+            phone: appointment.phone,
+            patientId: appointment.patientId
+          },
+          appointmentId: appointment._id,
+          appointmentStatus: appointment.status
+        }
       });
     }
-    return res.status(StatusCodes.OK).send({
-      status: 'Success',
-      message: 'This is an existing patient',
-      patient: {
-        id: prescription.id,
-        ...prescription.patient,
-        appointmentId: appointment._id,
-        diagnosis: prescription.diagnosis,
-        appointmentStatus: appointment.status
-      }
-    });
+    if (visitedAppointmentTime.length <= prescription.length) {
+      return res.status(StatusCodes.OK).send({
+        status: 'Success',
+        message: 'This is an existing patient',
+        data: {
+          patientCode:
+            visitedAppointmentTime.length === prescription.length
+              ? 'FOLLOW_UP_PATIENT'
+              : 'INPROGRESS_PATIENT',
+          patient: {
+            ...prescription[0].patient
+          },
+          ...(visitedAppointmentTime.length < prescription.length && {
+            diagnosis: prescription[0].diagnosis,
+            complaints: prescription[0].complaints,
+            findings: prescription[0].findings,
+            advice: prescription[0].advice,
+            prescriptionItems: prescription[0].prescriptionItems,
+            followUpDate: prescription[0].followUpDate,
+            prescriptionId: prescription[0]._id
+          }),
+          appointmentId: appointment._id,
+          appointmentStatus: appointment.status
+        }
+      });
+    }
   } catch (err) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
