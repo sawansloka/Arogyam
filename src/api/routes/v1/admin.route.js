@@ -95,6 +95,10 @@ router
   .post(adminAuth, adminController.generatePrescriptionPDF);
 
 router
+  .route('/prescriptions/pdf/download')
+  .get(adminAuth, adminController.downloadPrescription);
+
+router
   .route('/get-patient-data/:id')
   .get(adminAuth, adminController.getPatientData);
 

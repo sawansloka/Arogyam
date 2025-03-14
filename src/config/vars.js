@@ -19,7 +19,8 @@ module.exports = {
     region: process.env.DIGITAL_OCEAN_REGION,
     originUrl: process.env.DIGITAL_OCEAN_ORIGIN_ENDPOINT,
     accessKey: process.env.DIGITAL_OCEAN_ACCESS_KEY,
-    acessSecret: process.env.DIGITAL_OCEAN_ACCESS_SECRET,
-    metaBucket: process.env.S3_META_ASSETS_BUCKET
+    accessSecret: process.env.DIGITAL_OCEAN_ACCESS_SECRET,
+    s3Bucket: process.env.DIGITAL_OCEAN_S3_BUCKET,
+    prescriptionFolder: process.env.DIGITAL_OCEAN_PRESCRIPTION_FOLDER
   }
 };
