@@ -1187,7 +1187,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
 
 exports.downloadPrescription = async (req, res) => {
   try {
-    const { patientId } = req.body;
+    const { patientId } = req.query;
     const prescription = await Prescription.findOne({
       'patient.patientId': patientId
     });
