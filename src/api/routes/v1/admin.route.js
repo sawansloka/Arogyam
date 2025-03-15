@@ -112,6 +112,10 @@ router
   .post(adminAuth, restrictToDoctor, adminController.createDiagnosis);
 
 router
+  .route('/diagnosis')
+  .put(adminAuth, restrictToDoctor, adminController.updateDiagnosis);
+
+router
   .route('/diagnosis/:id')
   .get(adminAuth, restrictToDoctor, adminController.getDiagnosis);
 
