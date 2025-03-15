@@ -7,7 +7,7 @@ exports.renderPdf = async (template, renderData) => {
   // Launch Puppeteer and generate PDF
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: '/usr/bin/chromium-browser',
+    // executablePath: '/usr/bin/chromium-browser',
     // executablePath: '/opt/homebrew/bin/chromium',
     args: [
       '--no-sandbox',

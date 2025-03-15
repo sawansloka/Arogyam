@@ -965,10 +965,16 @@ exports.createPrescription = async (req, res) => {
     const prescription = new Prescription(req.body);
     await prescription.save();
 
+    const prescriptionList = await Prescription.find({
+      'patient.patientId': patientId
+    })
+      .sort({ createdDate: -1 })
+      .exec();
+
     return res.status(StatusCodes.CREATED).send({
       status: 'Success',
       message: 'Prescription created successfully',
-      data: prescription
+      data: giveGenericPatientResponse(patient, prescriptionList)
     });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
@@ -1063,10 +1069,26 @@ exports.updatePrescription = async (req, res) => {
       });
     }
 
+    const patient = await Patient.findOne({
+      patientId: prescription.patient.patientId
+    });
+    if (!patient) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+        status: 'Error',
+        message: 'Patient not found'
+      });
+    }
+
+    const prescriptionList = await Prescription.find({
+      'patient.patientId': prescription.patient.patientId
+    })
+      .sort({ createdDate: -1 })
+      .exec();
+
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       message: 'Prescription updated successfully',
-      data: prescription
+      data: giveGenericPatientResponse(patient, prescriptionList)
     });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
@@ -1232,50 +1254,12 @@ exports.getPatientData = async (req, res) => {
       .sort({ createdDate: -1 })
       .exec();
 
-    const appointment = await Patient.findOne({ patientId: id });
-    const { visitedAppointmentTime } = appointment;
-    if (!prescription || !prescription.length) {
-      return res.status(StatusCodes.OK).send({
-        status: 'Success',
-        message: 'This is a new patient',
-        data: {
-          patientCode: 'NEW_PATIENT',
-          patient: {
-            name: appointment.name,
-            phone: appointment.phone,
-            patientId: appointment.patientId
-          },
-          appointmentId: appointment._id,
-          appointmentStatus: appointment.status
-        }
-      });
-    }
-    if (visitedAppointmentTime.length <= prescription.length) {
-      return res.status(StatusCodes.OK).send({
-        status: 'Success',
-        message: 'This is an existing patient',
-        data: {
-          patientCode:
-            visitedAppointmentTime.length === prescription.length
-              ? 'FOLLOW_UP_PATIENT'
-              : 'INPROGRESS_PATIENT',
-          patient: {
-            ...prescription[0].patient
-          },
-          ...(visitedAppointmentTime.length < prescription.length && {
-            diagnosis: prescription[0].diagnosis,
-            complaints: prescription[0].complaints,
-            findings: prescription[0].findings,
-            advice: prescription[0].advice,
-            prescriptionItems: prescription[0].prescriptionItems,
-            followUpDate: prescription[0].followUpDate,
-            prescriptionId: prescription[0]._id
-          }),
-          appointmentId: appointment._id,
-          appointmentStatus: appointment.status
-        }
-      });
-    }
+    const patient = await Patient.findOne({ patientId: id });
+    return res.status(StatusCodes.OK).send({
+      status: 'Success',
+      message: 'Patient found successfully',
+      data: giveGenericPatientResponse(patient, prescription)
+    });
   } catch (err) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       status: 'Error',
@@ -1337,6 +1321,44 @@ exports.createDiagnosis = async (req, res) => {
   }
 };
 
+exports.updateDiagnosis = async (req, res) => {
+  try {
+    const { patientId, sections } = req.body;
+
+    const patient = await Patient.findOne({ patientId });
+
+    if (!patient) {
+      return res.status(StatusCodes.NOT_FOUND).send({
+        status: 'Error',
+        message: 'Patient not found'
+      });
+    }
+
+    const diagnosis = await Diagnosis.findOneAndUpdate(
+      {
+        patientId
+      },
+      {
+        sections
+      },
+      {
+        new: true
+      }
+    );
+
+    return res.status(StatusCodes.CREATED).send({
+      status: 'Success',
+      message: 'Diagnosis data updated successfully',
+      data: diagnosis
+    });
+  } catch (e) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      status: 'Creation failed',
+      error: e.message || e
+    });
+  }
+};
+
 exports.getDiagnosis = async (req, res) => {
   try {
     const patientId = req.params.id;
@@ -1352,6 +1374,7 @@ exports.getDiagnosis = async (req, res) => {
 
     return res.status(200).send({
       status: 'Success',
+      message: 'Diagnosis data fetched successfully',
       data: diagnosis
     });
   } catch (error) {
@@ -1359,5 +1382,43 @@ exports.getDiagnosis = async (req, res) => {
       status: 'Error',
       message: error.message || 'Failed to fetch diagnosis.'
     });
+  }
+};
+
+const giveGenericPatientResponse = (patient, prescription) => {
+  const { visitedAppointmentTime } = patient;
+  if (!prescription || !prescription.length) {
+    return {
+      patientCode: 'NEW_PATIENT',
+      patient: {
+        name: patient.name,
+        phone: patient.phone,
+        patientId: patient.patientId
+      },
+      appointmentId: patient._id,
+      appointmentStatus: patient.status
+    };
+  }
+  if (visitedAppointmentTime.length <= prescription.length) {
+    return {
+      patientCode:
+        visitedAppointmentTime.length === prescription.length
+          ? 'FOLLOW_UP_PATIENT'
+          : 'INPROGRESS_PATIENT',
+      patient: {
+        ...prescription[0].patient
+      },
+      ...(visitedAppointmentTime.length < prescription.length && {
+        diagnosis: prescription[0].diagnosis,
+        complaints: prescription[0].complaints,
+        findings: prescription[0].findings,
+        advice: prescription[0].advice,
+        prescriptionItems: prescription[0].prescriptionItems,
+        followUpDate: prescription[0].followUpDate,
+        prescriptionId: prescription[0]._id
+      }),
+      appointmentId: patient._id,
+      appointmentStatus: patient.status
+    };
   }
 };
