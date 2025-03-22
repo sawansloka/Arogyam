@@ -1,7 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
 const { v4: uuidv4 } = require('uuid');
 const {
-  toIST,
   checkSlotAvailibility,
   converBase64ToBuffer
 } = require('../../utils/publicHelper');
@@ -126,7 +125,7 @@ exports.listAvailableSlots = async (req, res) => {
       });
     }
 
-    const selectedDate = new Date(date);
+    const selectedDate = new Date(`${date}T00:00:00+05:30`);
 
     const slot = await Slot.findOne({
       date: {
@@ -144,11 +143,11 @@ exports.listAvailableSlots = async (req, res) => {
 
     const availableSlots = [];
     const promises = [];
-    const startTime = toIST(new Date(`${date}T${slot.startTime}:00`));
-    const endTime = toIST(new Date(`${date}T${slot.endTime}:00`));
+    const startTime = new Date(`${date}T${slot.startTime}:00`);
+    const endTime = new Date(`${date}T${slot.endTime}:00`);
     const breakTimes = slot.breakTime.map((b) => ({
-      start: toIST(new Date(`${date}T${b.start}:00`)),
-      end: toIST(new Date(`${date}T${b.end}:00`))
+      start: new Date(`${date}T${b.start}:00`),
+      end: new Date(`${date}T${b.end}:00`)
     }));
 
     const currentTime = new Date(startTime);
@@ -198,13 +197,11 @@ exports.listAvailableSlots = async (req, res) => {
 exports.bookAppointment = async (req, res) => {
   try {
     const { name, phone, email, appointmentTime } = req.body;
-    const currentTime = toIST(new Date());
+    const currentTime = new Date();
 
     const existingPatient = await Patient.findOne({ name, phone });
     if (existingPatient) {
-      const existingAppointmentTime = toIST(
-        new Date(existingPatient.appointmentTime)
-      );
+      const existingAppointmentTime = new Date(existingPatient.appointmentTime);
       if (existingAppointmentTime > currentTime) {
         return res.status(StatusCodes.BAD_REQUEST).send({
           status: 'Error',
@@ -219,16 +216,14 @@ exports.bookAppointment = async (req, res) => {
         );
       }
 
-      existingPatient.appointmentTime = toIST(new Date(appointmentTime));
+      existingPatient.appointmentTime = new Date(appointmentTime);
       existingPatient.queuePosition =
         (await Patient.countDocuments({
           appointmentTime: {
-            $gte: toIST(new Date(appointmentTime)),
-            $lt: toIST(
-              new Date(
-                new Date(appointmentTime).setHours(
-                  new Date(appointmentTime).getHours() + 1
-                )
+            $gte: new Date(appointmentTime),
+            $lt: new Date(
+              new Date(appointmentTime).setHours(
+                new Date(appointmentTime).getHours() + 1
               )
             )
           }
@@ -255,10 +250,13 @@ exports.bookAppointment = async (req, res) => {
 
     const slotDate = new Date(appointmentTime).toISOString().split('T')[0];
 
+    console.log(`Appointment time: ${appointmentTime}`);
+    console.log(`Slot date: ${slotDate}`);
+
     const slot = await Slot.findOne({
       date: {
-        $gte: new Date(`${slotDate}T00:00:00.000Z`),
-        $lt: new Date(`${slotDate}T23:59:59.999Z`)
+        $gte: new Date(`${slotDate}T00:00:00.000+05:30`),
+        $lt: new Date(`${slotDate}T23:59:59.999+05:30`)
       }
     });
 
@@ -269,14 +267,14 @@ exports.bookAppointment = async (req, res) => {
       });
     }
 
-    const startTime = toIST(new Date(`${slotDate}T${slot.startTime}:00`));
-    const endTime = toIST(new Date(`${slotDate}T${slot.endTime}:00`));
+    const startTime = new Date(`${slotDate}T${slot.startTime}:00`);
+    const endTime = new Date(`${slotDate}T${slot.endTime}:00`);
     const breakTimes = slot.breakTime.map((b) => ({
-      start: toIST(new Date(`${slotDate}T${b.start}:00`)),
-      end: toIST(new Date(`${slotDate}T${b.end}:00`))
+      start: new Date(`${slotDate}T${b.start}:00`),
+      end: new Date(`${slotDate}T${b.end}:00`)
     }));
 
-    const appointmentTimeIST = toIST(new Date(appointmentTime));
+    const appointmentTimeIST = new Date(appointmentTime);
 
     const isBreak = breakTimes.some(
       (b) => appointmentTimeIST >= b.start && appointmentTimeIST < b.end
@@ -296,11 +294,11 @@ exports.bookAppointment = async (req, res) => {
     const appointmentHour = appointmentTimeIST.getUTCHours();
 
     const startOfHour = new Date(appointmentTimeIST);
-    startOfHour.setUTCHours(appointmentHour, 0, 0, 0);
+    startOfHour.setHours(appointmentHour, 0, 0, 0);
 
     const endOfHour = new Date(startOfHour);
-    endOfHour.setUTCHours(appointmentHour + 1);
-    endOfHour.setUTCMilliseconds(-1);
+    endOfHour.setHours(appointmentHour + 1);
+    endOfHour.setMilliseconds(-1);
 
     const bookedCount = await Patient.countDocuments({
       appointmentTime: { $gte: startOfHour, $lte: endOfHour }
@@ -381,9 +379,7 @@ exports.trackAppointmentStatus = async (req, res) => {
       });
     }
 
-    const adjustedAppointmentTime = new Date(
-      patient.appointmentTime.getTime() - 5.5 * 60 * 60 * 1000
-    );
+    const adjustedAppointmentTime = new Date(patient.appointmentTime.getTime());
 
     return res.status(StatusCodes.OK).send({
       status: 'Success',
