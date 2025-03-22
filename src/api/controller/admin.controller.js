@@ -9,7 +9,6 @@ const {
   digitalOceanService
 } = require('../../config/vars');
 const {
-  toIST,
   convertToKebabCase,
   convertDateFormat
 } = require('../../utils/publicHelper');
@@ -332,7 +331,7 @@ const scheduleCronJob = async () => {
       // Calculate the date 15 days ago
       const pastDate = new Date(today);
       pastDate.setDate(today.getDate() - 15);
-      pastDate.setUTCHours(0, 0, 0, 0);
+      pastDate.setHours(0, 0, 0, 0);
 
       // Delete schedules that are 15 days older than today
       const deletedSlots = await Slot.deleteMany({
@@ -377,10 +376,10 @@ const scheduleCronJob = async () => {
 
       // Calculate the date for the 7th day from today
       const futureDate = new Date(today.setDate(today.getDate() + 7));
-      futureDate.setUTCHours(0, 0, 0, 0);
+      futureDate.setHours(0, 0, 0, 0);
 
       const nextDateUTC = new Date(futureDate);
-      nextDateUTC.setUTCDate(nextDateUTC.getUTCDate() + 1);
+      nextDateUTC.setDate(nextDateUTC.getDate() + 1);
 
       const slotsExist = await Slot.findOne({
         date: {
@@ -465,7 +464,7 @@ exports.setSchedule = async (req, res) => {
       req.body;
 
     const slot = new Slot({
-      date: toIST(new Date(date)),
+      date: new Date(date),
       startTime,
       endTime,
       breakTime,
@@ -605,10 +604,10 @@ exports.listAppointments = async (req, res) => {
     const limitNumber = parseInt(limit, 10) > 0 ? parseInt(limit, 10) : 10;
 
     if (date) {
-      const selectedDateUTC = new Date(date);
-      selectedDateUTC.setUTCHours(0, 0, 0, 0);
+      const selectedDateUTC = new Date(`${date}T00:00:00+05:30`);
+      selectedDateUTC.setHours(0, 0, 0, 0);
       const nextDayUTC = new Date(selectedDateUTC);
-      nextDayUTC.setUTCDate(selectedDateUTC.getUTCDate() + 1);
+      nextDayUTC.setHours(selectedDateUTC.getDate() + 1);
 
       const slot = await Slot.findOne({
         date: {
@@ -1147,7 +1146,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
 
     if (
       existingPatient.prescription.url &&
-      existingPatient.prescription.date.startsWith(toIST(new Date()))
+      existingPatient.prescription.date.startsWith(new Date())
     ) {
       return res.status(StatusCodes.BAD_REQUEST).send({
         status: 'Error',
@@ -1167,7 +1166,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
     count = existingPatient.prescription.url ? (count += 1) : 1;
 
     // Upload to Google Drive and get the link
-    const fileName = `${patient.patientId}-${convertToKebabCase(patient.name)}-${count}-${convertDateFormat(toIST(new Date()).toLocaleDateString())}-prescription.pdf`;
+    const fileName = `${patient.patientId}-${convertToKebabCase(patient.name)}-${count}-${convertDateFormat(new Date().toLocaleDateString())}-prescription.pdf`;
 
     // const pdfLink = await uploadPdfToGoogleDrive(pdfBuffer, fileName);
     await uploadToS3(
@@ -1189,7 +1188,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
 
     existingPatient.prescription = {
       url: prescriptionUrl,
-      date: toIST(new Date())
+      date: new Date()
     };
 
     await existingPatient.save();
