@@ -23,7 +23,7 @@ const { renderPdf } = require('../../utils/renderFile');
 const { uploadToS3 } = require('../../utils/s3');
 const ArogyamDiagnosis = require('../../utils/arogyamDiagnosis.json');
 const Diagnosis = require('../../model/diagnosis');
-const logger = require('../../config/logger');
+const { logger } = require('../../config/logger');
 
 // Clinic meta data
 exports.upsertClinicMeta = async (req, res) => {

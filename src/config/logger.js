@@ -1,4 +1,5 @@
 const winston = require('winston');
+const morgan = require('morgan');
 
 const logger = winston.createLogger({
   level: 'info',
@@ -19,4 +20,34 @@ const logger = winston.createLogger({
   ]
 });
 
-module.exports = logger;
+const responseInterceptor = (req, res, next) => {
+  const oldSend = res.send;
+
+  res.send = function (data) {
+    try {
+      res.locals.responseBody = JSON.parse(data);
+    } catch (e) {
+      res.locals.responseBody = data;
+    }
+    oldSend.apply(res, arguments);
+  };
+
+  next();
+};
+
+const morganMiddleware = morgan(
+  (tokens, req, res) =>
+    JSON.stringify({
+      level: 'INFO',
+      time: new Date().toISOString(),
+      method: tokens.method(req, res),
+      url: tokens.url(req, res),
+      status: Number(tokens.status(req, res)),
+      response_time: `${tokens['response-time'](req, res)}ms`,
+      request_body: req.body || {},
+      response_body: res.locals.responseBody || {}
+    }),
+  { stream: { write: (message) => logger.info(JSON.parse(message)) } }
+);
+
+module.exports = { logger, responseInterceptor, morganMiddleware };

@@ -11,7 +11,7 @@ const Slot = require('../../model/slot');
 const { getImage } = require('../../utils/gridFsHelper');
 const { uploadToS3 } = require('../../utils/s3');
 const { digitalOceanService } = require('../../config/vars');
-const logger = require('../../config/logger');
+const { logger } = require('../../config/logger');
 
 // Clinic Home Data
 exports.getClinicMeta = async (req, res) => {

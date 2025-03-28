@@ -1,7 +1,7 @@
 const { google } = require('googleapis');
 const stream = require('stream');
 const { googleService } = require('../config/vars');
-const logger = require('../config/logger');
+const { logger } = require('../config/logger');
 
 exports.uploadPdfToGoogleDrive = async (pdfBuffer, fileName) => {
   const { clientId, clientSecret, redirectUri, refreshToken, folderId } =

@@ -1,6 +1,6 @@
 const { S3, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { digitalOceanService } = require('../config/vars');
-const logger = require('../config/logger');
+const { logger } = require('../config/logger');
 
 const s3Client = new S3({
   forcePathStyle: false,
