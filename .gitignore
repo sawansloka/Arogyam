@@ -1,3 +1,6 @@
 .env
 /node_modules
 credentials.json
+logs
+commit.txt
+package-lock.json

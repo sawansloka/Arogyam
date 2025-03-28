@@ -23,6 +23,7 @@ const { renderPdf } = require('../../utils/renderFile');
 const { uploadToS3 } = require('../../utils/s3');
 const ArogyamDiagnosis = require('../../utils/arogyamDiagnosis.json');
 const Diagnosis = require('../../model/diagnosis');
+const logger = require('../../config/logger');
 
 // Clinic meta data
 exports.upsertClinicMeta = async (req, res) => {
@@ -324,7 +325,7 @@ const scheduleCronJob = async () => {
     const clinicMetaData = await ClinicMetaData.findOne({});
 
     if (clinicMetaData && clinicMetaData.schedule.isCronJobEnabled) {
-      console.log('Cron job is enabled, checking for schedules...');
+      logger.info('Cron job is enabled, checking for schedules...');
 
       const today = new Date();
 
@@ -339,11 +340,11 @@ const scheduleCronJob = async () => {
       });
 
       if (deletedSlots.deletedCount > 0) {
-        console.log(
+        logger.info(
           `Cron job deleted ${deletedSlots.deletedCount} schedules older than 15 days.`
         );
       } else {
-        console.log('No schedules found that are older than 15 days.');
+        logger.info('No schedules found that are older than 15 days.');
       }
 
       // Find patients with status 'BOOKED' for previous dates
@@ -354,7 +355,7 @@ const scheduleCronJob = async () => {
 
       if (outdatedPatients.length > 0) {
         const patientIds = outdatedPatients.map((patient) => patient._id);
-        console.log(
+        logger.info(
           `Cron job found ${outdatedPatients.length} outdated patients with status 'BOOKED'. Patient IDs:`,
           patientIds
         );
@@ -367,11 +368,11 @@ const scheduleCronJob = async () => {
           { $set: { status: 'CANCELLED' } }
         );
 
-        console.log(
+        logger.info(
           `Cron job updated the status of ${outdatedPatients.length} patients to 'CANCELLED'.`
         );
       } else {
-        console.log('No outdated patients found with status "BOOKED".');
+        logger.info('No outdated patients found with status "BOOKED".');
       }
 
       // Calculate the date for the 7th day from today
@@ -403,18 +404,18 @@ const scheduleCronJob = async () => {
         });
 
         await slot.save();
-        console.log('Cron job created a new schedule for the 7th day.');
+        logger.info('Cron job created a new schedule for the 7th day.');
       } else {
-        console.log(
+        logger.info(
           'Cron job skipped: Schedule already exists for the 7th day.'
         );
       }
     } else {
-      console.log('Cron job is disabled, stopping the job.');
+      logger.info('Cron job is disabled, stopping the job.');
       job.stop();
     }
   } catch (error) {
-    console.error('Error in cron job:', error.message);
+    logger.error('Error in cron job:', error.message);
   }
 };
 
@@ -441,19 +442,19 @@ exports.toggleCronJob = async (req, res) => {
       clinicMetaData.schedule.isCronJobEnabled = true;
       await clinicMetaData.save();
       job.start();
-      console.log('Cron job enabled.');
+      logger.info('Cron job enabled.');
       return res.status(200).json({ message: 'Cron job enabled.' });
     }
     if (action === 'disable') {
       clinicMetaData.schedule.isCronJobEnabled = false;
       await clinicMetaData.save();
       job.stop();
-      console.log('Cron job disabled.');
+      logger.info('Cron job disabled.');
       return res.status(200).json({ message: 'Cron job disabled.' });
     }
     return res.status(400).json({ message: 'Invalid action for cron job.' });
   } catch (error) {
-    console.error('Error toggling cron job:', error.message);
+    logger.error('Error toggling cron job:', error.message);
     return res.status(500).json({ message: 'Internal server error.' });
   }
 };
@@ -1177,7 +1178,7 @@ exports.generatePrescriptionPDF = async (req, res) => {
     );
     const prescriptionUrl = `${digitalOceanService.originUrl}/${digitalOceanService.prescriptionFolder}/${fileName}`;
 
-    console.log(`PDF uploaded to Google Drive with link: ${prescriptionUrl}`);
+    logger.info(`PDF uploaded to Google Drive with link: ${prescriptionUrl}`);
 
     if (existingPatient.prescription.url) {
       existingPatient.visitedPrescriptionUrls.push({

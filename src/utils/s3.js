@@ -1,5 +1,6 @@
 const { S3, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { digitalOceanService } = require('../config/vars');
+const logger = require('../config/logger');
 
 const s3Client = new S3({
   forcePathStyle: false,
@@ -23,7 +24,7 @@ exports.uploadToS3 = async (fileBuffer, filename, bucket, folder = '') => {
     const res = await s3Client.send(new PutObjectCommand(uploadParams));
     return res;
   } catch (error) {
-    console.error('Error uploading file to S3:', error);
+    logger.error('Error uploading file to S3:', error);
     throw new Error('Failed to upload file to S3');
   }
 };

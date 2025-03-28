@@ -11,6 +11,7 @@ const Slot = require('../../model/slot');
 const { getImage } = require('../../utils/gridFsHelper');
 const { uploadToS3 } = require('../../utils/s3');
 const { digitalOceanService } = require('../../config/vars');
+const logger = require('../../config/logger');
 
 // Clinic Home Data
 exports.getClinicMeta = async (req, res) => {
@@ -250,8 +251,8 @@ exports.bookAppointment = async (req, res) => {
 
     const slotDate = new Date(appointmentTime).toISOString().split('T')[0];
 
-    console.log(`Appointment time: ${appointmentTime}`);
-    console.log(`Slot date: ${slotDate}`);
+    logger.info(`Appointment time: ${appointmentTime}`);
+    logger.info(`Slot date: ${slotDate}`);
 
     const slot = await Slot.findOne({
       date: {
@@ -440,7 +441,7 @@ exports.patientPortal = async (req, res) => {
 
     return res.status(200).json(response);
   } catch (error) {
-    console.error('Error fetching patient data:', error);
+    logger.error('Error fetching patient data:', error);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
