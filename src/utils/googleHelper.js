@@ -1,6 +1,7 @@
 const { google } = require('googleapis');
 const stream = require('stream');
 const { googleService } = require('../config/vars');
+const { logger } = require('../config/logger');
 
 exports.uploadPdfToGoogleDrive = async (pdfBuffer, fileName) => {
   const { clientId, clientSecret, redirectUri, refreshToken, folderId } =
@@ -51,8 +52,8 @@ exports.uploadPdfToGoogleDrive = async (pdfBuffer, fileName) => {
 
     return result.data.webViewLink; // Returns the link to view the file
   } catch (error) {
-    console.error('Error details:', error.response.data);
-    console.error('Error uploading file to Google Drive:', error.message);
+    logger.error('Error details:', error.response.data);
+    logger.error('Error uploading file to Google Drive:', error.message);
     throw new Error('Failed to upload file to Google Drive');
   }
 };
