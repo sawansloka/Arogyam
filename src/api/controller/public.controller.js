@@ -314,20 +314,29 @@ exports.bookAppointment = async (req, res) => {
       });
     }
 
-    const startTime = new Date(`${slotDate}T${slot.startTime}:00`);
-    const endTime = new Date(`${slotDate}T${slot.endTime}:00`);
+    const startTime = new Date(`${slotDate}T${slot.startTime}:00.000+05.30`);
+    const endTime = new Date(`${slotDate}T${slot.endTime}:00.000+05.30`);
     const breakTimes = slot.breakTime.map((b) => ({
-      start: new Date(`${slotDate}T${b.start}:00`),
-      end: new Date(`${slotDate}T${b.end}:00`)
+      start: new Date(`${slotDate}T${b.start}:00.000+05.30`),
+      end: new Date(`${slotDate}T${b.end}:00.000+05.30`)
     }));
 
     const appointmentTimeIST = new Date(appointmentTime);
 
-    logger.info(
-      'Checking if the selected time is within break periods or outside working hours...'
-    );
     const isBreak = breakTimes.some(
       (b) => appointmentTimeIST >= b.start && appointmentTimeIST < b.end
+    );
+    logger.info(
+      `Checking if the selected time is within break periods or outside working hours. 
+        StartTime: ${startTime.toISOString()}, 
+        EndTime: ${endTime.toISOString()}, 
+        isBreak: ${isBreak},
+        BreakTimes: ${JSON.stringify(
+          breakTimes.map((b) => ({
+            start: b.start.toISOString(),
+            end: b.end.toISOString()
+          }))
+        )}`
     );
     if (
       isBreak ||
@@ -352,7 +361,9 @@ exports.bookAppointment = async (req, res) => {
     endOfHour.setHours(appointmentHour + 1);
     endOfHour.setMilliseconds(-1);
 
-    logger.info('Checking if the selected time slot is fully booked...');
+    logger.info(
+      `Checking if the selected time slot is fully booked... StartOfHour: ${startOfHour.toISOString()}, EndOfHour: ${endOfHour.toISOString()}`
+    );
     const bookedCount = await Patient.countDocuments({
       appointmentTime: { $gte: startOfHour, $lte: endOfHour }
     });
