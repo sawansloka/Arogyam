@@ -38,8 +38,6 @@ const responseInterceptor = (req, res, next) => {
 const morganMiddleware = morgan(
   (tokens, req, res) =>
     JSON.stringify({
-      level: 'INFO',
-      time: new Date().toISOString(),
       method: tokens.method(req, res),
       url: tokens.url(req, res),
       status: Number(tokens.status(req, res)),
