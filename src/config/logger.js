@@ -1,7 +1,7 @@
 const winston = require('winston');
 
 const logger = winston.createLogger({
-  level: 'info', // Log only if the severity is 'info' or higher
+  level: 'info',
   format: winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
     winston.format.printf(({ timestamp, level, message }) =>
@@ -13,9 +13,9 @@ const logger = winston.createLogger({
     )
   ),
   transports: [
-    new winston.transports.Console(), // Log to console
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }), // Log errors to file
-    new winston.transports.File({ filename: 'logs/combined.log' }) // Log all levels to file
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'logs/combined.log' })
   ]
 });
 
