@@ -314,11 +314,12 @@ exports.bookAppointment = async (req, res) => {
       });
     }
 
-    const startTime = new Date(`${slotDate}T${slot.startTime}:00.000+05.30`);
-    const endTime = new Date(`${slotDate}T${slot.endTime}:00.000+05.30`);
+    logger.info(`Slot for the selected date found: ${slot.date.toISOString()}`);
+    const startTime = new Date(`${slotDate}T${slot.startTime}:00+05:30`);
+    const endTime = new Date(`${slotDate}T${slot.endTime}:00.000+05:30`);
     const breakTimes = slot.breakTime.map((b) => ({
-      start: new Date(`${slotDate}T${b.start}:00.000+05.30`),
-      end: new Date(`${slotDate}T${b.end}:00.000+05.30`)
+      start: new Date(`${slotDate}T${b.start}:00.000+05:30`),
+      end: new Date(`${slotDate}T${b.end}:00.000+05:30`)
     }));
 
     const appointmentTimeIST = new Date(appointmentTime);
@@ -355,11 +356,11 @@ exports.bookAppointment = async (req, res) => {
 
     const appointmentHour = appointmentTimeIST.getUTCHours();
     const startOfHour = new Date(appointmentTimeIST);
-    startOfHour.setHours(appointmentHour, 0, 0, 0);
+    startOfHour.setUTCHours(appointmentHour);
 
     const endOfHour = new Date(startOfHour);
-    endOfHour.setHours(appointmentHour + 1);
-    endOfHour.setMilliseconds(-1);
+    endOfHour.setUTCHours(appointmentHour + 1);
+    endOfHour.setUTCMilliseconds(-1);
 
     logger.info(
       `Checking if the selected time slot is fully booked... StartOfHour: ${startOfHour.toISOString()}, EndOfHour: ${endOfHour.toISOString()}`
