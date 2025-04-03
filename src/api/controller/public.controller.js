@@ -425,43 +425,34 @@ exports.trackAppointmentStatus = async (req, res) => {
       `Tracking appointment status for Name: ${name}, Phone: ${phone}`
     );
 
-    const todayUTC = new Date();
-    todayUTC.setUTCHours(0, 0, 0, 0);
-
-    const tomorrowUTC = new Date(todayUTC);
-    tomorrowUTC.setUTCDate(todayUTC.getUTCDate() + 1);
-
     const phoneNumber = Number(phone);
 
-    logger.info("Searching for patient with today's appointment...");
+    logger.info('Searching for the latest booked appointment...');
     const patient = await Patient.findOne({
       name,
       phone: phoneNumber,
-      appointmentTime: { $gte: todayUTC, $lt: tomorrowUTC },
       status: 'BOOKED'
-    });
+    }).sort({ appointmentTime: 1 });
 
     if (!patient) {
-      logger.warn('No appointment found for today.');
+      logger.warn('No upcoming appointment found.');
       return res.status(StatusCodes.OK).send({
         status: 'Success',
         data: {
-          date: todayUTC.toISOString().split('T')[0],
+          date: '',
           time: '',
-          status: 'No appointment found for today',
+          status: 'No upcoming appointment found',
           position: 0
         }
       });
     }
 
-    logger.info('Appointment found. Returning appointment details...');
-    const adjustedAppointmentTime = new Date(patient.appointmentTime.getTime());
-
+    logger.info('Upcoming appointment found. Returning details...');
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       data: {
         date: patient.appointmentTime.toISOString().split('T')[0],
-        time: adjustedAppointmentTime.toTimeString().split(' ')[0],
+        time: patient.appointmentTime.toTimeString().split(' ')[0],
         status: patient.status,
         position: patient.queuePosition
       }
@@ -494,6 +485,8 @@ exports.patientPortal = async (req, res) => {
 
     const patientData = await Patient.findOne({ patientId, phone });
 
+    console.log('patientData', patientData);
+
     if (!patientData) {
       logger.warn(
         `Patient not found for Patient ID: ${patientId}, Phone: ${phone}`
@@ -522,7 +515,7 @@ exports.patientPortal = async (req, res) => {
       queuePosition: patientData.queuePosition,
       payment,
       visitedAppointmentTime: patientData.visitedAppointmentTime || null,
-      prescriptionUrl: patientData.prescriptionUrl || null,
+      prescriptionUrl: patientData.prescription.url || null,
       visitedPrescriptionUrls: patientData.visitedPrescriptionUrls || null
     };
 
