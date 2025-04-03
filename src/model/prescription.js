@@ -10,7 +10,7 @@ const prescriptionSchema = new mongoose.Schema({
     weight: { type: Number },
     height: { type: Number },
     bmi: { type: Number },
-    bp: { type: Number },
+    bp: { type: String },
     address: { type: String }
   },
   diagnosis: {
