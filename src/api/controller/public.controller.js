@@ -447,12 +447,17 @@ exports.trackAppointmentStatus = async (req, res) => {
       });
     }
 
+    const istDate = new Date(patient.appointmentTime).toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata'
+    });
+    const istDateObj = new Date(istDate);
+
     logger.info('Upcoming appointment found. Returning details...');
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       data: {
-        date: patient.appointmentTime.toISOString().split('T')[0],
-        time: patient.appointmentTime.toTimeString().split(' ')[0],
+        date: istDateObj.toISOString().split('T')[0],
+        time: istDateObj.toTimeString().split(' ')[0],
         status: patient.status,
         position: patient.queuePosition
       }
