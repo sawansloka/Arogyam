@@ -1,5 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
 const { v4: uuidv4 } = require('uuid');
+const moment = require('moment-timezone');
 const {
   checkSlotAvailibility,
   converBase64ToBuffer
@@ -447,17 +448,15 @@ exports.trackAppointmentStatus = async (req, res) => {
       });
     }
 
-    const istDate = new Date(patient.appointmentTime).toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata'
-    });
-    const istDateObj = new Date(istDate);
-
     logger.info('Upcoming appointment found. Returning details...');
+
+    const istMoment = moment.tz(patient.appointmentTime, 'Asia/Kolkata');
+
     return res.status(StatusCodes.OK).send({
       status: 'Success',
       data: {
-        date: istDateObj.toISOString().split('T')[0],
-        time: istDateObj.toTimeString().split(' ')[0],
+        date: istMoment.format('YYYY-MM-DD'),
+        time: istMoment.format('HH:mm:ss'),
         status: patient.status,
         position: patient.queuePosition
       }

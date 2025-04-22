@@ -2,6 +2,7 @@ const { StatusCodes } = require('http-status-codes');
 const cron = require('node-cron');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+const moment = require('moment-timezone');
 const {
   adminSecretKey,
   nonDocSecretKey,
@@ -407,7 +408,7 @@ exports.deleteFeedback = async (req, res) => {
 };
 
 // schedule slots
-const scheduleCronJob = async () => {
+exports.scheduleCronJob = async () => {
   try {
     logger.info('Starting scheduleCronJob function...');
     const clinicMetaData = await ClinicMetaData.findOne({});
@@ -415,13 +416,12 @@ const scheduleCronJob = async () => {
     if (clinicMetaData && clinicMetaData.schedule.isCronJobEnabled) {
       logger.info('Cron job is enabled, checking for schedules...');
 
-      const today = new Date();
+      const today = moment().tz('Asia/Kolkata');
       logger.info(`Today's date: ${today.toISOString()}`);
 
       // Calculate the date 15 days ago
-      const pastDate = new Date(today);
-      pastDate.setDate(today.getDate() - 15);
-      pastDate.setHours(0, 0, 0, 0);
+      const pastDate = today.clone().subtract(15, 'days');
+      pastDate.startOf('day');
       logger.info(`Deleting schedules older than: ${pastDate.toISOString()}`);
 
       // Delete schedules that are 15 days older than today
@@ -467,14 +467,13 @@ const scheduleCronJob = async () => {
       }
 
       // Calculate the date for the 7th day from today
-      const futureDate = new Date(today.setDate(today.getDate() + 7));
-      futureDate.setHours(0, 0, 0, 0);
+      const futureDate = today.clone().add(7, 'days');
+      futureDate.startOf('day');
       logger.info(
         `Checking for schedules on the 7th day: ${futureDate.toISOString()}`
       );
 
-      const nextDateUTC = new Date(futureDate);
-      nextDateUTC.setDate(nextDateUTC.getDate() + 1);
+      const nextDateUTC = futureDate.clone().add(1, 'days');
 
       const slotsExist = await Slot.findOne({
         date: {
@@ -516,7 +515,7 @@ const scheduleCronJob = async () => {
   }
 };
 
-let job = cron.schedule('0 0 * * *', scheduleCronJob, { scheduled: true });
+let job = cron.schedule('0 0 * * *', this.scheduleCronJob, { scheduled: true });
 
 // Function to manually start or stop the cron job from an API
 exports.toggleCronJob = async (req, res) => {
@@ -747,11 +746,13 @@ exports.listAppointments = async (req, res) => {
     );
 
     if (date) {
-      logger.info(`Filtering appointments by date: ${date}`);
-      const selectedDateUTC = new Date(`${date}T00:00:00+05:30`);
-      selectedDateUTC.setHours(0, 0, 0, 0);
-      const nextDayUTC = new Date(selectedDateUTC);
-      nextDayUTC.setHours(selectedDateUTC.getDate() + 1);
+      const selectedDateUTC = moment.tz(`${date}T00:00:00`, 'Asia/Kolkata');
+      selectedDateUTC.startOf('day');
+      const nextDayUTC = selectedDateUTC.clone().add(1, 'days');
+
+      logger.info(
+        `Filtering appointments by date from ${selectedDateUTC} to ${nextDayUTC}`
+      );
 
       const slot = await Slot.findOne({
         date: {
@@ -779,14 +780,14 @@ exports.listAppointments = async (req, res) => {
       filter.name = { $regex: name, $options: 'i' };
     }
 
-    if (appointmentIds.length > 0) {
-      logger.info(`Filtering appointments by extracted IDs.`);
-      filter._id = { $in: appointmentIds };
-    }
+    logger.info(`Filtering appointments by extracted IDs. ${appointmentIds}`);
+    filter._id = { $in: appointmentIds };
 
     const skip = (pageNumber - 1) * limitNumber;
 
-    logger.info('Fetching appointments from the database...');
+    logger.info(
+      `Fetching appointments from the database with filter ${JSON.stringify(filter)}...`
+    );
     const appointments = await Patient.find(filter)
       .skip(skip)
       .limit(limitNumber)
